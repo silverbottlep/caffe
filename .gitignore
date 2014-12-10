@@ -86,3 +86,7 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+
+# tags
+tags
+cscope*

@@ -66,6 +66,62 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
   CHECK(proto.SerializeToOstream(&output));
 }
 
+bool ReadFlowToDatum(const string& filename, const int label, const int start_frame,
+		const int nchannels, const int height, const int width, Datum* datum) {
+  cv::Mat cv_img_x;
+  cv::Mat cv_img_y;
+  int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
+	int num_channels = 2*nchannels;
+	datum->set_channels(num_channels);
+
+	for (int i=start_frame; i<start_frame+nchannels; i++){
+		string* datum_string;
+		char numstr[7]={0};
+		sprintf(numstr,"_f%04d",i);
+		string numstr_string(numstr);
+		string framename_x = filename + numstr_string + "_optx.jpg";
+		string framename_y = filename + numstr_string + "_opty.jpg";
+
+		cv::Mat cv_img_origin_x = cv::imread(framename_x, cv_read_flag);
+		cv::Mat cv_img_origin_y = cv::imread(framename_y, cv_read_flag);
+		if (!cv_img_origin_x.data || !cv_img_origin_y.data) {
+			LOG(ERROR) << "Could not open or find file " << framename_x;
+			return false;
+		}
+		if (height > 0 && width > 0) {
+			cv::resize(cv_img_origin_x, cv_img_x, cv::Size(width, height));
+			cv::resize(cv_img_origin_y, cv_img_y, cv::Size(width, height));
+		} else {
+			cv_img_x = cv_img_origin_x;
+			cv_img_y = cv_img_origin_y;
+		}
+		
+		if (i==start_frame){
+			datum->set_height(cv_img_x.rows);
+			datum->set_width(cv_img_x.cols);
+			datum->set_label(label);
+			datum->clear_data();
+			datum->clear_float_data();
+			datum_string = datum->mutable_data();
+		}
+
+		for (int h = 0; h < cv_img_x.rows; ++h) {
+			for (int w = 0; w < cv_img_x.cols; ++w) {
+				datum_string->push_back(
+						static_cast<char>(cv_img_x.at<uchar>(h, w)));
+			}
+		}
+		for (int h = 0; h < cv_img_y.rows; ++h) {
+			for (int w = 0; w < cv_img_y.cols; ++w) {
+				datum_string->push_back(
+						static_cast<char>(cv_img_y.at<uchar>(h, w)));
+			}
+		}
+
+	}
+
+  return true;
+}
 bool ReadVideoToDatum(const string& filename, const int label, const int nframes,
     const int height, const int width, const bool is_color, Datum* datum) {
   cv::Mat cv_img;

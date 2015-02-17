@@ -213,6 +213,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new HingeLossLayer<Dtype>(param);
   case LayerParameter_LayerType_IMAGE_DATA:
     return new ImageDataLayer<Dtype>(param);
+  case LayerParameter_LayerType_VIDEO_DATA:
+    return new VideoDataLayer<Dtype>(param);
   case LayerParameter_LayerType_IM2COL:
     return new Im2colLayer<Dtype>(param);
   case LayerParameter_LayerType_INFOGAIN_LOSS:

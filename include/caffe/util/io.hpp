@@ -89,6 +89,9 @@ inline void WriteProtoToBinaryFile(
   WriteProtoToBinaryFile(proto, filename.c_str());
 }
 
+bool ReadVideoToDatum(const string& filename, const int label, const int nframes,
+    const int height, const int width, const bool is_color, Datum* datum);
+
 bool ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color, Datum* datum);
 

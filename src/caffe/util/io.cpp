@@ -66,6 +66,64 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
   CHECK(proto.SerializeToOstream(&output));
 }
 
+bool ReadVideoToDatum(const string& filename, const int label, const int nframes,
+    const int height, const int width, const bool is_color, Datum* datum) {
+  cv::Mat cv_img;
+  int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR :
+    CV_LOAD_IMAGE_GRAYSCALE);
+	int num_channels = (is_color ? 3 : 1);
+
+	for (int i=0; i<nframes; i++){
+		string* datum_string;
+		char numstr[7]={0};
+		sprintf(numstr,"_f%04d",i+1);
+		string numstr_string(numstr);
+		string framename = filename + numstr_string + ".jpg";
+
+		cv::Mat cv_img_origin = cv::imread(framename, cv_read_flag);
+		if (!cv_img_origin.data) {
+			LOG(ERROR) << "Could not open or find file " << framename;
+			return false;
+		}
+		if (height > 0 && width > 0) {
+			cv::resize(cv_img_origin, cv_img, cv::Size(width, height));
+		} else {
+			cv_img = cv_img_origin;
+		}
+		
+		if (i==0){
+			datum->set_channels(num_channels);
+			datum->set_height(cv_img.rows);
+			datum->set_width(cv_img.cols);
+			datum->set_label(label);
+			datum->clear_data();
+			datum->clear_float_data();
+			datum_string = datum->mutable_data();
+		}
+
+		if (is_color) {
+			for (int c = 0; c < num_channels; ++c) {
+				for (int h = 0; h < cv_img.rows; ++h) {
+					for (int w = 0; w < cv_img.cols; ++w) {
+						datum_string->push_back(
+								static_cast<char>(cv_img.at<cv::Vec3b>(h, w)[c]));
+					}
+				}
+			}
+		} else {  // Faster than repeatedly testing is_color for each pixel w/i loop
+			for (int h = 0; h < cv_img.rows; ++h) {
+				for (int w = 0; w < cv_img.cols; ++w) {
+					datum_string->push_back(
+							static_cast<char>(cv_img.at<uchar>(h, w)));
+				}
+			}
+		}
+
+	}
+
+  return true;
+}
+
 bool ReadImageToDatum(const string& filename, const int label,
     const int height, const int width, const bool is_color, Datum* datum) {
   cv::Mat cv_img;

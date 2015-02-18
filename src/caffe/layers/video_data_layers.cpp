@@ -120,7 +120,7 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
     // get a blob
     CHECK_GT(lines_size, lines_id_);
 		int nframes = lines_[lines_id_].second;
-		int start_frame = (rand()%(nframes-num_channels))+1;
+		int start_frame = (rand()%(nframes-num_channels-1))+1;
     if (!ReadFlowToDatum(root_folder + lines_[lines_id_].first.first, 
 					lines_[lines_id_].first.second, start_frame, num_channels, 
 					new_height, new_width, &datum)){

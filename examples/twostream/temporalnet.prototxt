@@ -1,12 +1,19 @@
 name: "TEMPORAL_NET"
 layers {
   name: "data"
-  type: VIDEO_DATA
+type: VIDEO_DATA
+#type: DATA
   top: "data"
   top: "label"
+#  data_param {
+#    source: "/home/eunbyung/Works/data/ucf101_train1_opt_lmdb/"
+#    batch_size: 256
+#		num_channels: 10
+#    backend: LMDB
+#  }
   video_data_param {
     source: "data/ucf101/train1.txt"
-    root_folder: "/home/eunbyung/Works/data/ucf101_opt_jpeg/"
+    root_dir: "/home/eunbyung/Works/data/ucf101_opt/"
 		shuffle: true
     batch_size: 256
 		num_channels: 10
@@ -20,12 +27,19 @@ layers {
 }
 layers {
   name: "data"
-  type: VIDEO_DATA
+type: VIDEO_DATA
+#type: DATA
   top: "data"
   top: "label"
+#  data_param {
+#    source: "/home/eunbyung/Works/data/ucf101_test1_opt_lmdb/"
+#    batch_size: 50
+#		num_channels: 10
+#    backend: LMDB
+#  }
   video_data_param {
     source: "data/ucf101/test1.txt"
-    root_folder: "/home/eunbyung/Works/data/ucf101_opt_jpeg/"
+    root_dir: "/home/eunbyung/Works/data/ucf101_opt/"
     batch_size: 50
 		num_channels: 10
   }

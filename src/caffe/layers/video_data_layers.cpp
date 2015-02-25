@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <sys/stat.h>
 
 #include "caffe/data_layers.hpp"
 #include "caffe/layer.hpp"
@@ -10,11 +11,11 @@
 #include "caffe/util/math_functions.hpp"
 #include "caffe/util/rng.hpp"
 
-namespace caffe {
+	namespace caffe {
 
-template <typename Dtype>
-VideoDataLayer<Dtype>::~VideoDataLayer<Dtype>() {
-  this->JoinPrefetchThread();
+	template <typename Dtype>
+	VideoDataLayer<Dtype>::~VideoDataLayer<Dtype>() {
+		this->JoinPrefetchThread();
 }
 
 template <typename Dtype>
@@ -24,7 +25,7 @@ void VideoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   const int new_height = video_data_param.new_height();
   const int new_width  = video_data_param.new_width();
   const int num_channels = video_data_param.num_channels();
-	string root_folder = video_data_param.root_folder();
+	string root_dir = video_data_param.root_dir();
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
       "new_height and new_width to be set at the same time.";
@@ -64,7 +65,7 @@ void VideoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << "Image list is empty (filename: \"" + source + "\")";
   // Read a data point, and use it to initialize the top blob.
   Datum datum;
-	CHECK(ReadFlowToDatum(root_folder + lines_[lines_id_].first.first, 
+	CHECK(ReadFlowToDatum(root_dir, lines_[lines_id_].first.first, 
 			lines_[lines_id_].first.second, 1, num_channels, new_height, new_width, &datum));
 
   // image
@@ -112,7 +113,7 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
   const int new_height = video_data_param.new_height();
   const int new_width = video_data_param.new_width();
   const int num_channels = video_data_param.num_channels();
-	string root_folder = video_data_param.root_folder();
+	string root_dir = video_data_param.root_dir();
 
   // datum scales
   const int lines_size = lines_.size();
@@ -121,12 +122,12 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
     CHECK_GT(lines_size, lines_id_);
 		int nframes = lines_[lines_id_].second;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
-    if (!ReadFlowToDatum(root_folder + lines_[lines_id_].first.first, 
+    if (!ReadFlowToDatum(root_dir,lines_[lines_id_].first.first, 
 					lines_[lines_id_].first.second, start_frame, num_channels, 
 					new_height, new_width, &datum)){
       continue;
     }
-		//LOG(ERROR) << lines_[lines_id_].first.first << " nframes: " << nframes
+		//LOG(INFO) << lines_[lines_id_].first.first << " nframes: " << nframes
 			//<< " start_frame: " << start_frame;
 
     // Apply transformations (mirror, crop...) to the data

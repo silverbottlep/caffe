@@ -171,8 +171,9 @@ void DataLayer<Dtype>::InternalThreadEntry() {
       LOG(FATAL) << "Unknown database backend";
     }
 
-    // Apply data transformations (mirror, scale, crop...)
+		// Apply data transformations (mirror, scale, crop...)
     this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
+		//this->data_transformer_.TransformVideo(item_id, datum, this->mean_, num_samples, top_data);
 
     if (this->output_labels_) {
       top_label[item_id] = datum.label();

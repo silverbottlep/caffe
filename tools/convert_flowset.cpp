@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
 	Datum datum;
 
 	for (int line_id = 0; line_id < lines.size(); ++line_id) {
-		if (!ReadFlowToDatum(root_folder + lines[line_id].first.first, 
+		if (!ReadFlowToDatum(root_folder, lines[line_id].first.first, 
 					lines[line_id].first.second, 1, 
 					lines[line_id].second-1, /* optflow has n-1 frames */
 					resize_height, resize_width, &datum)) {

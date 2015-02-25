@@ -424,6 +424,8 @@ message DataParameter {
   // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
   // be larger than the number of keys in the leveldb.
   optional uint32 rand_skip = 7 [default = 0];
+	// num channel(for video input, how many consecutive frames we need to sample)
+  optional uint32 num_channels = 9 [default = 0];
   optional DB backend = 8 [default = LEVELDB];
   // DEPRECATED. See TransformationParameter. For data pre-processing, we can do
   // simple scaling and subtracting the data mean, if provided. Note that the
@@ -537,7 +539,7 @@ message VideoDataParameter {
   // Specify the data source.
   optional string source = 1;
   // Specify the root folder that contains images.
-  optional string root_folder= 2;
+  optional string root_dir= 2;
   // Specify the batch size.
   optional uint32 batch_size = 4;
   // The rand_skip variable is for the data layer to skip a few data points

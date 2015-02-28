@@ -65,7 +65,7 @@ void VideoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << "Image list is empty (filename: \"" + source + "\")";
   // Read a data point, and use it to initialize the top blob.
   Datum datum;
-	CHECK(ReadFlowToDatum(root_dir, lines_[lines_id_].first.first, 
+	CHECK(ReadFlowToDatum2(root_dir, lines_[lines_id_].first.first, 
 			lines_[lines_id_].first.second, 1, num_channels, new_height, new_width, &datum));
 
   // image
@@ -122,18 +122,16 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
     CHECK_GT(lines_size, lines_id_);
 		int nframes = lines_[lines_id_].second;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
-    if (!ReadFlowToDatum(root_dir,lines_[lines_id_].first.first, 
+    if (!ReadFlowToDatum2(root_dir,lines_[lines_id_].first.first, 
 					lines_[lines_id_].first.second, start_frame, num_channels, 
 					new_height, new_width, &datum)){
       continue;
     }
-		//LOG(INFO) << lines_[lines_id_].first.first << " nframes: " << nframes
-			//<< " start_frame: " << start_frame;
-
     // Apply transformations (mirror, crop...) to the data
     this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
 
     top_label[item_id] = datum.label();
+		//LOG(INFO) << lines_[lines_id_].first.first << " label:" << top_label[item_id] << " nframes: " << nframes << " start_frame: " << start_frame;
     // go to the next iter
     lines_id_++;
     if (lines_id_ >= lines_size) {
@@ -144,7 +142,7 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
         ShuffleImages();
       }
     }
-  }
+	}
 }
 
 INSTANTIATE_CLASS(VideoDataLayer);

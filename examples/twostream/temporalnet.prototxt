@@ -13,7 +13,7 @@ type: VIDEO_DATA
 #  }
   video_data_param {
     source: "data/ucf101/train1.txt"
-    root_dir: "/home/eunbyung/Works/data/ucf101_opt/"
+    root_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
     batch_size: 256
 		num_channels: 10
@@ -39,7 +39,7 @@ type: VIDEO_DATA
 #  }
   video_data_param {
     source: "data/ucf101/test1.txt"
-    root_dir: "/home/eunbyung/Works/data/ucf101_opt/"
+    root_dir: "data/ucf101/ucf101_opt/"
     batch_size: 50
 		num_channels: 10
   }
@@ -276,7 +276,7 @@ layers {
   name: "drop6"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.9
   }
 }
 layers {
@@ -312,7 +312,7 @@ layers {
   name: "drop7"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.9
   }
 }
 layers {

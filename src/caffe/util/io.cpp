@@ -148,14 +148,68 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
 //  return true;
 //}
 
+bool ReadFlowToDatum2(const string& root_dir, const string& filename, 
+		const int label, const int start_frame, const int nchannels, 
+		const int height, const int width, Datum* datum) {
+  cv::Mat cv_img;
+  int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
+	int num_stacks = 2*nchannels;
+	datum->set_channels(num_stacks);
+
+	for (int i=start_frame; i<start_frame+nchannels; i++){
+		string* datum_string;
+		char numstr[7]={0};
+		sprintf(numstr,"_f%04d",i);
+		string numstr_string(numstr);
+		path framename(root_dir);
+		framename /= filename; framename /= filename + numstr_string + "_opt.jpg";
+
+		cv::Mat cv_img_origin = cv::imread(framename.string(), cv_read_flag);
+		if (!cv_img_origin.data) {
+			LOG(ERROR) << "Could not open or find file " << framename.string();
+			return false;
+		}
+		if (height > 0 && width > 0) {
+			cv::resize(cv_img_origin, cv_img, cv::Size(width, height*2));
+		} else {
+			cv_img = cv_img_origin;
+		}
+		
+		if (i==start_frame){
+			datum->set_height(cv_img.rows/2);
+			datum->set_width(cv_img.cols);
+			datum->set_label(label);
+			datum->clear_data();
+			datum->clear_float_data();
+			datum_string = datum->mutable_data();
+		}
+
+		for (int h = 0; h < cv_img.rows/2; ++h) {
+			for (int w = 0; w < cv_img.cols; ++w) {
+				datum_string->push_back(
+						static_cast<char>(cv_img.at<uchar>(h, w)));
+			}
+		}
+		for (int h = cv_img.rows/2; h < cv_img.rows; ++h) {
+			for (int w = 0; w < cv_img.cols; ++w) {
+				datum_string->push_back(
+						static_cast<char>(cv_img.at<uchar>(h, w)));
+			}
+		}
+
+	}
+
+  return true;
+}
+
 bool ReadFlowToDatum(const string& root_dir, const string& filename, 
 		const int label, const int start_frame, const int nchannels, 
 		const int height, const int width, Datum* datum) {
   cv::Mat cv_img_x;
   cv::Mat cv_img_y;
   int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
-	int num_channels = 2*nchannels;
-	datum->set_channels(num_channels);
+	int num_stacks= 2*nchannels;
+	datum->set_channels(num_stacks);
 
 	for (int i=start_frame; i<start_frame+nchannels; i++){
 		string* datum_string;

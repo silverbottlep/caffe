@@ -554,6 +554,12 @@ message VideoDataParameter {
   optional uint32 new_width = 10 [default = 0];
 	// How many frames? default is consecutive 10 frames
   optional uint32 num_channels = 11 [default = 10];
+  enum InputType{
+    IMAGE = 0;
+    FLOW = 1;
+  }
+	// flow(0) jpeg(1)
+  optional InputType input_type = 12 [default = IMAGE ];
 }
 
 // Message that stores parameters InfogainLossLayer

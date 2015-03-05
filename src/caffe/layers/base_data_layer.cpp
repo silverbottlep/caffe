@@ -38,7 +38,7 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     ReadProtoFromBinaryFileOrDie(mean_file.c_str(), &blob_proto);
     data_mean_.FromProto(blob_proto);
     CHECK_GE(data_mean_.num(), 1);
-    CHECK_GE(data_mean_.channels(), datum_channels_);
+    //CHECK_GE(data_mean_.channels(), datum_channels_);
     CHECK_GE(data_mean_.height(), datum_height_);
     CHECK_GE(data_mean_.width(), datum_width_);
   } else {

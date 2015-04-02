@@ -16,6 +16,7 @@ using namespace caffe;  // NOLINT(build/namespaces)
 
 // The pointer to the internal caffe::Net instance
 static shared_ptr<Net<float> > net_;
+static shared_ptr<Net<float> > net2_;
 static int init_key = -2;
 
 // Five things to be aware of:
@@ -70,6 +71,58 @@ static mxArray* do_forward(const mxArray* const bottom) {
     }  // switch (Caffe::mode())
   }
   const vector<Blob<float>*>& output_blobs = net_->ForwardPrefilled();
+  mxArray* mx_out = mxCreateCellMatrix(output_blobs.size(), 1);
+  for (unsigned int i = 0; i < output_blobs.size(); ++i) {
+    // internally data is stored as (width, height, channels, num)
+    // where width is the fastest dimension
+    mwSize dims[4] = {output_blobs[i]->width(), output_blobs[i]->height(),
+      output_blobs[i]->channels(), output_blobs[i]->num()};
+    mxArray* mx_blob =  mxCreateNumericArray(4, dims, mxSINGLE_CLASS, mxREAL);
+    mxSetCell(mx_out, i, mx_blob);
+    float* data_ptr = reinterpret_cast<float*>(mxGetPr(mx_blob));
+    switch (Caffe::mode()) {
+    case Caffe::CPU:
+      caffe_copy(output_blobs[i]->count(), output_blobs[i]->cpu_data(),
+          data_ptr);
+      break;
+    case Caffe::GPU:
+      caffe_copy(output_blobs[i]->count(), output_blobs[i]->gpu_data(),
+          data_ptr);
+      break;
+    default:
+      LOG(FATAL) << "Unknown Caffe mode.";
+    }  // switch (Caffe::mode())
+  }
+
+  return mx_out;
+}
+
+static mxArray* do_forward2(const mxArray* const bottom) {
+  vector<Blob<float>*>& input_blobs = net2_->input_blobs();
+  CHECK_EQ(static_cast<unsigned int>(mxGetDimensions(bottom)[0]),
+      input_blobs.size());
+  for (unsigned int i = 0; i < input_blobs.size(); ++i) {
+    const mxArray* const elem = mxGetCell(bottom, i);
+    CHECK(mxIsSingle(elem))
+        << "MatCaffe require single-precision float point data";
+    CHECK_EQ(mxGetNumberOfElements(elem), input_blobs[i]->count())
+        << "MatCaffe input size does not match the input size of the network";
+    const float* const data_ptr =
+        reinterpret_cast<const float* const>(mxGetPr(elem));
+    switch (Caffe::mode()) {
+    case Caffe::CPU:
+      caffe_copy(input_blobs[i]->count(), data_ptr,
+          input_blobs[i]->mutable_cpu_data());
+      break;
+    case Caffe::GPU:
+      caffe_copy(input_blobs[i]->count(), data_ptr,
+          input_blobs[i]->mutable_gpu_data());
+      break;
+    default:
+      LOG(FATAL) << "Unknown Caffe mode.";
+    }  // switch (Caffe::mode())
+  }
+  const vector<Blob<float>*>& output_blobs = net2_->ForwardPrefilled();
   mxArray* mx_out = mxCreateCellMatrix(output_blobs.size(), 1);
   for (unsigned int i = 0; i < output_blobs.size(); ++i) {
     // internally data is stored as (width, height, channels, num)
@@ -281,6 +334,28 @@ static void init(MEX_ARGS) {
   }
 }
 
+static void init2(MEX_ARGS) {
+  if (nrhs != 2) {
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+  }
+
+  char* param_file = mxArrayToString(prhs[0]);
+  char* model_file = mxArrayToString(prhs[1]);
+
+  net2_.reset(new Net<float>(string(param_file)));
+  net2_->CopyTrainedLayersFrom(string(model_file));
+
+  mxFree(param_file);
+  mxFree(model_file);
+
+  init_key = random();  // NOLINT(caffe/random_fn)
+
+  if (nlhs == 1) {
+    plhs[0] = mxCreateDoubleScalar(init_key);
+  }
+}
+
 static void reset(MEX_ARGS) {
   if (net_) {
     net_.reset();
@@ -297,6 +372,14 @@ static void forward(MEX_ARGS) {
 
   plhs[0] = do_forward(prhs[0]);
 }
+static void forward2(MEX_ARGS) {
+  if (nrhs != 1) {
+    LOG(ERROR) << "Only given " << nrhs << " arguments";
+    mexErrMsgTxt("Wrong number of arguments");
+  }
+
+  plhs[0] = do_forward2(prhs[0]);
+}
 
 static void backward(MEX_ARGS) {
   if (nrhs != 1) {
@@ -309,6 +392,14 @@ static void backward(MEX_ARGS) {
 
 static void is_initialized(MEX_ARGS) {
   if (!net_) {
+    plhs[0] = mxCreateDoubleScalar(0);
+  } else {
+    plhs[0] = mxCreateDoubleScalar(1);
+  }
+}
+
+static void is_initialized2(MEX_ARGS) {
+  if (!net2_) {
     plhs[0] = mxCreateDoubleScalar(0);
   } else {
     plhs[0] = mxCreateDoubleScalar(1);
@@ -351,9 +442,12 @@ struct handler_registry {
 static handler_registry handlers[] = {
   // Public API functions
   { "forward",            forward         },
+  { "forward2",           forward2        },
   { "backward",           backward        },
   { "init",               init            },
+  { "init2",              init2           },
   { "is_initialized",     is_initialized  },
+  { "is_initialized2",    is_initialized2 },
   { "set_mode_cpu",       set_mode_cpu    },
   { "set_mode_gpu",       set_mode_gpu    },
   { "set_phase_train",    set_phase_train },

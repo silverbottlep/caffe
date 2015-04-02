@@ -6,7 +6,7 @@ im_height = size(im,1);
 im_width = size(im,2);
 
 % oversample (4 corners, center, and their x-axis flips)
-images = zeros(CROPPED_DIM, CROPPED_DIM, 3, 10, 'single');
+% images = zeros(CROPPED_DIM, CROPPED_DIM, 3, 10, 'single');
 indices_y = [0 im_height-CROPPED_DIM] + 1;
 indices_x = [0 im_width-CROPPED_DIM] + 1;
 curr = 1;

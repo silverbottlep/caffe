@@ -65,6 +65,7 @@ class BaseDataLayer : public Layer<Dtype> {
   const Dtype* mean_;
   Caffe::Phase phase_;
   bool output_labels_;
+  bool additional_data_;
 };
 
 template <typename Dtype>
@@ -92,6 +93,7 @@ class BasePrefetchingDataLayer :
 
  protected:
   Blob<Dtype> prefetch_data_;
+  Blob<Dtype> prefetch_data2_;
   Blob<Dtype> prefetch_label_;
 };
 
@@ -283,6 +285,35 @@ class VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
   explicit VideoDataLayer(const LayerParameter& param)
       : BasePrefetchingDataLayer<Dtype>(param) {}
   virtual ~VideoDataLayer();
+  virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_IMAGE_DATA;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 0; }
+  virtual inline int ExactNumTopBlobs() const { return 2; }
+
+ protected:
+  shared_ptr<Caffe::RNG> prefetch_rng_;
+  virtual void ShuffleImages();
+  virtual void InternalThreadEntry();
+
+  vector< std::pair< std::pair<std::string, int>, int> > lines_;
+  int lines_id_;
+};
+
+/**
+ * @brief Provides data to the Net from video files(all frames are stored in jpeg)
+ *
+ * TODO(dox): thorough documentation for Forward and proto params.
+ */
+template <typename Dtype>
+class ConsilienceDataLayer : public BasePrefetchingDataLayer<Dtype> {
+ public:
+  explicit ConsilienceDataLayer(const LayerParameter& param)
+      : BasePrefetchingDataLayer<Dtype>(param) {}
+  virtual ~ConsilienceDataLayer();
   virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       vector<Blob<Dtype>*>* top);
 

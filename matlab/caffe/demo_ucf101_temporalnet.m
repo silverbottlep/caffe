@@ -2,9 +2,9 @@ src_dir = '../../data/ucf101/ucf101_opt/';
 list_file = '../../data/ucf101/test1.txt';
 
 model_def_file = '../../examples/twostream/temporalnet_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/temporalnet_iter_200000.caffemodel';
+model_file = '../../examples/twostream/snapshot/temporalnet_iter_180000.caffemodel';
 use_gpu = true;
-matcaffe_init(use_gpu, model_def_file, model_file, 2);
+matcaffe_init(use_gpu, model_def_file, model_file, 0);
 
 flow_mean = imread('../../data/ucf101/ucf101_flow_mean.binaryproto.jpg');
 FLOW_MEAN = single(flow_mean);

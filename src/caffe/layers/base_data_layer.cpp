@@ -18,9 +18,15 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       vector<Blob<Dtype>*>* top) {
   if (top->size() == 1) {
     output_labels_ = false;
-  } else {
+		additional_data_ = false;
+  } else if (top->size() == 2) {
     output_labels_ = true;
+		additional_data_ = false;
   }
+	else {
+    output_labels_ = true;
+		additional_data_ = true;
+	}
   DataLayerSetUp(bottom, top);
   // The subclasses should setup the datum channels, height and width
   CHECK_GT(datum_channels_, 0);
@@ -58,6 +64,9 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
   // simultaneous cudaMalloc calls when the main thread is running. In some
   // GPUs this seems to cause failures if we do not so.
   this->prefetch_data_.mutable_cpu_data();
+  if (this->additional_data_) {
+		this->prefetch_data2_.mutable_cpu_data();
+	}
   if (this->output_labels_) {
     this->prefetch_label_.mutable_cpu_data();
   }
@@ -86,6 +95,10 @@ void BasePrefetchingDataLayer<Dtype>::Forward_cpu(
   // Copy the data
   caffe_copy(prefetch_data_.count(), prefetch_data_.cpu_data(),
              (*top)[0]->mutable_cpu_data());
+  if (this->additional_data_) {
+		caffe_copy(prefetch_data2_.count(), prefetch_data2_.cpu_data(),
+             (*top)[2]->mutable_cpu_data());
+	}
   if (this->output_labels_) {
     caffe_copy(prefetch_label_.count(), prefetch_label_.cpu_data(),
                (*top)[1]->mutable_cpu_data());

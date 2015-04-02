@@ -12,6 +12,10 @@ void BasePrefetchingDataLayer<Dtype>::Forward_gpu(
   // Copy the data
   caffe_copy(prefetch_data_.count(), prefetch_data_.cpu_data(),
       (*top)[0]->mutable_gpu_data());
+  if (this->additional_data_) {
+		caffe_copy(prefetch_data2_.count(), prefetch_data2_.cpu_data(),
+             (*top)[2]->mutable_gpu_data());
+	}
   if (this->output_labels_) {
     caffe_copy(prefetch_label_.count(), prefetch_label_.cpu_data(),
         (*top)[1]->mutable_gpu_data());

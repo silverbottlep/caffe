@@ -119,7 +119,8 @@ void ImageDataLayer<Dtype>::InternalThreadEntry() {
     }
 
     // Apply transformations (mirror, crop...) to the data
-    this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
+		struct transform_param t_param;
+    this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
 
     top_label[item_id] = datum.label();
     // go to the next iter

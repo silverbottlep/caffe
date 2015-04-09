@@ -6,6 +6,11 @@
 
 namespace caffe {
 
+struct transform_param {
+	int h_off;
+	int w_off;
+	int mirrored;
+};
 /**
  * @brief Applies common transformations to the input data, such as
  * scaling, mirroring, substracting the image mean...
@@ -36,9 +41,12 @@ class DataTransformer {
    *    written at the appropriate place within the blob's data.
    */
   void Transform(const int batch_item_id, const Datum& datum,
-                 const Dtype* mean, Dtype* transformed_data);
+                 const Dtype* mean, Dtype* transformed_data, struct transform_param* t_parm);
   void FlowTransform(const int batch_item_id, const Datum& datum,
                  const Dtype* mean, Dtype* transformed_data);
+	void ConsilienceTransform(const int batch_item_id, 
+					const Datum& flow_datum, Dtype* transformed_flow_data, 
+					struct transform_param& t_param);
 
  protected:
   virtual unsigned int Rand();

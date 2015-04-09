@@ -1,0 +1,14 @@
+net: "examples/twostream/spatialnet_ft_consilience.prototxt"
+test_iter: 80
+test_interval: 1000
+base_lr: 0.01
+lr_policy: "step"
+gamma: 0.1
+stepsize: 14000
+display: 100
+max_iter: 35000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 35000
+snapshot_prefix: "examples/twostream/snapshot/spatialnet_ft_consilience"
+solver_mode: GPU

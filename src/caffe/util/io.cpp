@@ -19,6 +19,7 @@
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
 #include "caffe/util/io.hpp"
+#include "caffe/data_transformer.hpp"
 
 namespace caffe {
 
@@ -70,83 +71,93 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
   CHECK(proto.SerializeToOstream(&output));
 }
 
-//bool ReadFlowTarToDatum(const string& root_dir, const string& filename, const int label, const int start_frame, const int nchannels, const int height, const int width, Datum* datum) {
-//  cv::Mat cv_img_x;
-//  cv::Mat cv_img_y;
-//  int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
-//	int num_channels = 2*nchannels;
-//	string temp_directory = "/tmp/caffe_readflow/" + filename + "/";
-//	string tar_name = root_dir + filename + ".tar";
-//
-//	int res = mkdir(temp_directory.c_str(), S_IRWXU|S_IRWXG);
-//	if(res){
-//			LOG(ERROR) << "Could not open or find directory " << temp_directory;
-//			return false;
-//	}
-//
-//	string command = "tar xf " + tar_name + " -C " + temp_directory;
-//	res = system(command.c_str());
-//	if(res){
-//			LOG(ERROR) << "Could not extract tarball to " << temp_directory;
-//			return false;
-//	}
-//
-//	datum->set_channels(num_channels);
-//	for (int i=start_frame; i<start_frame+nchannels; i++){
-//		string* datum_string;
-//		char numstr[7]={0};
-//		sprintf(numstr,"_f%04d",i);
-//		string numstr_string(numstr);
-//		string framename_x = temp_directory + filename + numstr_string + "_optx.jpg";
-//		string framename_y = temp_directory + filename + numstr_string + "_opty.jpg";
-//
-//		cv::Mat cv_img_origin_x = cv::imread(framename_x, cv_read_flag);
-//		cv::Mat cv_img_origin_y = cv::imread(framename_y, cv_read_flag);
-//		if (!cv_img_origin_x.data || !cv_img_origin_y.data) {
-//			LOG(ERROR) << "Could not open or find file " << framename_x;
-//			return false;
-//		}
-//		if (height > 0 && width > 0) {
-//			cv::resize(cv_img_origin_x, cv_img_x, cv::Size(width, height));
-//			cv::resize(cv_img_origin_y, cv_img_y, cv::Size(width, height));
-//		} else {
-//			cv_img_x = cv_img_origin_x;
-//			cv_img_y = cv_img_origin_y;
-//		}
-//		
-//		if (i==start_frame){
-//			datum->set_height(cv_img_x.rows);
-//			datum->set_width(cv_img_x.cols);
-//			datum->set_label(label);
-//			datum->clear_data();
-//			datum->clear_float_data();
-//			datum_string = datum->mutable_data();
-//		}
-//
-//		for (int h = 0; h < cv_img_x.rows; ++h) {
-//			for (int w = 0; w < cv_img_x.cols; ++w) {
-//				datum_string->push_back(
-//						static_cast<char>(cv_img_x.at<uchar>(h, w)));
+bool ReadFlowMagnitude(const string& flow_dir, const string& filename, 
+		const int start_frame, const int height, const int width, Datum* datum, 
+		struct transform_param* t_param)
+{
+  cv::Mat cv_img;
+  int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
+
+//	float min, max;
+//	char comma;
+//	path minmax_fname(minmax_dir);
+//	minmax_fname /= filename; minmax_fname+= "_minmax.txt";
+//  std::ifstream minmax_file(minmax_fname.c_str());
+//	minmax_file >> min >> comma >> max;
+//  LOG(INFO) << "minmax " << filename << ": " << min << ", " << max;
+
+	string* datum_string;
+	char numstr[7]={0};
+	sprintf(numstr,"_f%04d",start_frame);
+	string numstr_string(numstr);
+	path framename(flow_dir);
+	framename /= filename; framename /= filename + numstr_string + "_optmag.jpg";
+
+	cv::Mat cv_img_origin = cv::imread(framename.string(), cv_read_flag);
+	if (!cv_img_origin.data) {
+		LOG(ERROR) << "Could not open or find file " << framename.string();
+		return false;
+	}
+	if (height > 0 && width > 0) {
+		cv::resize(cv_img_origin, cv_img, cv::Size(width, height*2));
+	} else {
+		cv_img = cv_img_origin;
+	}
+	cv::Rect roi(t_param->w_off, t_param->h_off, 224, 224);
+	cv::Mat transformed_img = cv_img(roi);
+	if (t_param->mirrored) {
+		// horizontal flip
+		cv::flip(transformed_img, transformed_img, 1);
+	}
+	cv::resize(transformed_img, transformed_img, cv::Size(13,13));
+
+	datum->set_channels(1);
+	datum->set_height(transformed_img.rows);
+	datum->set_width(transformed_img.cols);
+	datum->clear_data();
+	datum->clear_float_data();
+	datum_string = datum->mutable_data();
+
+	for (int h = 0; h < transformed_img.rows; ++h) {
+		for (int w = 0; w < transformed_img.cols; ++w) {
+			datum_string->push_back(
+					static_cast<char>(transformed_img.at<uchar>(h, w)));
+		}
+//		LOG(INFO) << static_cast<int>(transformed_img.at<uchar>(h, 0))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 1))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 2))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 3))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 4))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 5))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 6))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 7))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 8))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 9))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 10))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 11))
+//			<< " " << static_cast<int>(transformed_img.at<uchar>(h, 12));
+	}
+
+//	float max=4, min=1;
+//	float scale = 255/(max - min);
+	//if (t_param->mirrored) {
+//		for (int h = 0; h < cv_img.rows; ++h) {
+//			for (int w = 0; w < cv_img.cols; ++w) {
+//				float value = min + static_cast<float>(cv_img.at<uchar>(h, w))/scale;
+//				datum_string->push_back(static_cast<char>(value));
 //			}
 //		}
-//		for (int h = 0; h < cv_img_y.rows; ++h) {
-//			for (int w = 0; w < cv_img_y.cols; ++w) {
-//				datum_string->push_back(
-//						static_cast<char>(cv_img_y.at<uchar>(h, w)));
+//	} else {
+//		for (int h = 0; h < cropped_img.rows; ++h) {
+//			for (int w = 0; w < cropped_img.cols; ++w) {
+//				magnitude[h*cropped_img.cols+w] = 
+//					min + static_cast<float>(cropped_img.at<uchar>(h, w))/scale;
 //			}
 //		}
-//
 //	}
-//
-//	command = "rm -rf " + temp_directory;
-//	res = system(command.c_str());
-//	if(res){
-//			LOG(ERROR) << "Could not delete files in " << temp_directory;
-//			return false;
-//	}
-//
-//  return true;
-//}
+
+  return true;
+}
 
 bool ReadFlowToDatum(const string& root_dir, const string& filename, 
 		const int label, const int start_frame, const int nchannels, 

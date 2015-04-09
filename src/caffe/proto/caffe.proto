@@ -571,7 +571,8 @@ message ConsilienceDataParameter {
   // Specify the root folder that contains images.
   optional string image_dir= 2;
   // Specify the root folder that contains images.
-  optional string flow_dir= 3;
+  optional string flow_dir= 12;
+  optional string minmax_dir= 13;
   // Specify the batch size.
   optional uint32 batch_size = 4;
   // The rand_skip variable is for the data layer to skip a few data points

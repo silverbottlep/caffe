@@ -22,8 +22,7 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   } else if (top->size() == 2) {
     output_labels_ = true;
 		additional_data_ = false;
-  }
-	else {
+  } else if (top->size() == 3) {
     output_labels_ = true;
 		additional_data_ = true;
 	}

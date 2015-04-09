@@ -29,6 +29,7 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
   const int new_width  = consilience_data_param.new_width();
   const int num_channels = consilience_data_param.num_channels();
 	string image_dir = consilience_data_param.image_dir();
+	string flow_dir = consilience_data_param.flow_dir();
 
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
@@ -69,15 +70,20 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
       << "Image list is empty (filename: \"" + source + "\")";
   // Read a data point, and use it to initialize the top blob.
   Datum datum;
+  Datum flow_datum;
+	float mag[36];
+	struct transform_param t_param;
+	t_param.h_off = 0;
+	t_param.w_off = 0;
+	t_param.mirrored = 0;
 	path framename(image_dir);
 	framename /= lines_[lines_id_].first.first; 
 	framename /= lines_[lines_id_].first.first + "_f0001.jpg";
 	CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
 				new_height, new_width, &datum));
 		
-//		CHECK(ReadFlowToDatum(flow_dir, lines_[lines_id_].first.first, 
-//			lines_[lines_id_].first.second, 1, num_channels, 
-//			new_height, new_width, &datum));
+	CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
+		1, new_height, new_width, &flow_datum, &t_param));
 
   // image
   const int crop_size = this->layer_param_.transform_param().crop_size();
@@ -86,15 +92,17 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
     (*top)[0]->Reshape(batch_size, datum.channels(), crop_size, crop_size);
     this->prefetch_data_.Reshape(batch_size, datum.channels(), crop_size,
                                  crop_size);
+		// flow_data
+    (*top)[2]->Reshape(batch_size, 1, 13, 13);
+    this->prefetch_data2_.Reshape(batch_size, 1, 13, 13);
   } else {
     (*top)[0]->Reshape(batch_size, datum.channels(), datum.height(),
                        datum.width());
     this->prefetch_data_.Reshape(batch_size, datum.channels(), datum.height(),
         datum.width());
+    (*top)[2]->Reshape(batch_size, 1, 13, 13);
+    this->prefetch_data2_.Reshape(batch_size, 1, 13, 13);
   }
-  // flow_data
-  (*top)[2]->Reshape(batch_size, 512, 6, 6);
-	this->prefetch_data2_.Reshape(batch_size, 512, 6, 6);
   LOG(INFO) << "output data1 size: " << (*top)[0]->num() << ","
       << (*top)[0]->channels() << "," << (*top)[0]->height() << ","
       << (*top)[0]->width();
@@ -122,6 +130,7 @@ void ConsilienceDataLayer<Dtype>::ShuffleImages() {
 template <typename Dtype>
 void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
   Datum datum;
+  Datum flow_datum;
   CHECK(this->prefetch_data_.count());
   Dtype* top_data = this->prefetch_data_.mutable_cpu_data();
   Dtype* top_data2 = this->prefetch_data2_.mutable_cpu_data();
@@ -132,6 +141,9 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
   const int new_width = consilience_data_param.new_width();
   const int num_channels = consilience_data_param.num_channels();
 	string image_dir= consilience_data_param.image_dir();
+	string flow_dir= consilience_data_param.flow_dir();
+	const int flow_height = this->prefetch_data2_.height();
+	const int flow_width = this->prefetch_data2_.width();
 
   // datum scales
   const int lines_size = lines_.size();
@@ -140,6 +152,8 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
     CHECK_GT(lines_size, lines_id_);
 		int nframes = lines_[lines_id_].second;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
+		struct transform_param t_param;
+		float mag[36];
 		
 		path framename(image_dir);
 		char numstr[7]={0};
@@ -149,11 +163,26 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";
 		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
 					new_height, new_width, &datum));
-		
-		this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
+		this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
 
+		// read optical flow image, crop it, mirroring, resize it to 13,13(conv5)
+		CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
+					start_frame, new_height, new_width, &flow_datum, &t_param));
+		const string& flow_data = flow_datum.data();
+		for (int h = 0; h < flow_height; ++h) {
+			for (int w = 0; w < flow_width; ++w) {
+				int top_index = (item_id*flow_height + h) * flow_width + w;
+				int data_index = h*flow_width + w;
+				top_data2[top_index] =
+					static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+			}
+		}
+		//LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off << " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored << " flow_size: " << flow_size;
+//		this->data_transformer_.ConsilienceTransform(item_id, flow_datum, 
+//						top_data2, t_param);
+//		LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off
+//			<< " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored;
     top_label[item_id] = datum.label();
-		//LOG(INFO) << lines_[lines_id_].first.first << " label:" << top_label[item_id] << " nframes: " << nframes << " start_frame: " << start_frame;
     // go to the next iter
     lines_id_++;
     if (lines_id_ >= lines_size) {

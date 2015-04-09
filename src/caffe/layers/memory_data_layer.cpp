@@ -44,8 +44,9 @@ void MemoryDataLayer<Dtype>::AddDatumVector(const vector<Datum>& datum_vector) {
   Dtype* top_label = added_label_.mutable_cpu_data();
   for (int batch_item_id = 0; batch_item_id < num; ++batch_item_id) {
     // Apply data transformations (mirror, scale, crop...)
+		struct transform_param t_param;
     this->data_transformer_.Transform(
-        batch_item_id, datum_vector[batch_item_id], this->mean_, top_data);
+        batch_item_id, datum_vector[batch_item_id], this->mean_, top_data, &t_param);
     top_label[batch_item_id] = datum_vector[batch_item_id].label();
   }
   // num_images == batch_size_

@@ -147,7 +147,8 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
 			CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
 						new_height, new_width, &datum));
 			
-			this->data_transformer_.Transform(item_id, datum, this->mean_, top_data);
+			struct transform_param t_param;
+			this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
 		}
 		else {
 			if (!ReadFlowToDatum(root_dir,lines_[lines_id_].first.first, 

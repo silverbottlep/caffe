@@ -10,7 +10,8 @@ template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const int batch_item_id,
                                        const Datum& datum,
                                        const Dtype* mean,
-                                       Dtype* transformed_data) {
+                                       Dtype* transformed_data,
+																			 struct transform_param *t_param) {
   const string& data = datum.data();
   const int channels = datum.channels();
   const int height = datum.height();
@@ -21,6 +22,9 @@ void DataTransformer<Dtype>::Transform(const int batch_item_id,
   const bool mirror = param_.mirror();
   const Dtype scale = param_.scale();
 
+	t_param->h_off = 0;
+	t_param->w_off = 0;
+	t_param->mirrored = 0;
 	if (mirror && crop_size == 0) {
     LOG(FATAL) << "Current implementation requires mirror and crop_size to be "
                << "set at the same time.";
@@ -37,6 +41,8 @@ void DataTransformer<Dtype>::Transform(const int batch_item_id,
       h_off = (height - crop_size) / 2;
       w_off = (width - crop_size) / 2;
     }
+		t_param->h_off = h_off;
+		t_param->w_off = w_off;
     if (mirror && Rand() % 2) {
       // Copy mirrored version
       for (int c = 0; c < channels; ++c) {
@@ -52,6 +58,7 @@ void DataTransformer<Dtype>::Transform(const int batch_item_id,
           }
         }
       }
+			t_param->mirrored = 1;
     } else {
       // Normal copy
       for (int c = 0; c < channels; ++c) {
@@ -85,6 +92,72 @@ void DataTransformer<Dtype>::Transform(const int batch_item_id,
     }
   }
 }
+
+template<typename Dtype>
+void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id, 
+					const Datum& flow_datum, Dtype* transformed_flow_data, 
+					struct transform_param& t_param) {
+  const string& flow_data = flow_datum.data();
+  const int channels = flow_datum.channels();
+  const int height = flow_datum.height();
+  const int width = flow_datum.width();
+  const int size = flow_datum.channels() * flow_datum.height() * flow_datum.width();
+
+  const int crop_size = param_.crop_size();
+  const bool mirror = param_.mirror();
+
+	if (mirror && crop_size == 0) {
+    LOG(FATAL) << "Current implementation requires mirror and crop_size to be "
+               << "set at the same time.";
+  }
+
+  if (crop_size) {
+    CHECK(flow_data.size()) << "Image cropping only support uint8 data";
+    int h_off = t_param.h_off;
+		int w_off = t_param.w_off;
+    if (mirror && t_param.mirrored) {
+      // Copy mirrored version
+      for (int c = 0; c < channels; ++c) {
+        for (int h = 0; h < crop_size; ++h) {
+          for (int w = 0; w < crop_size; ++w) {
+            int data_index = (c * height + h + h_off) * width + w + w_off;
+            int top_index = ((batch_item_id * channels + c) * crop_size + h)
+                * crop_size + (crop_size - 1 - w);
+            transformed_flow_data[top_index] =
+                static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+          }
+        }
+      }
+    } else {
+      // Normal copy
+      for (int c = 0; c < channels; ++c) {
+        for (int h = 0; h < crop_size; ++h) {
+          for (int w = 0; w < crop_size; ++w) {
+            int top_index = ((batch_item_id * channels + c) * crop_size + h)
+                * crop_size + w;
+            int data_index = (c * height + h + h_off) * width + w + w_off;
+            transformed_flow_data[top_index] =
+                static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+          }
+        }
+      }
+    }
+  } else {
+    // we will prefer to use data() first, and then try float_data()
+    if (flow_data.size()) {
+      for (int j = 0; j < size; ++j) {
+        transformed_flow_data[j + batch_item_id * size] =
+            static_cast<Dtype>(static_cast<uint8_t>(flow_data[j]));
+      }
+    } else {
+      for (int j = 0; j < size; ++j) {
+        transformed_flow_data[j + batch_item_id * size] =
+            flow_datum.float_data(j);
+      }
+    }
+  }
+}
+
 
 template<typename Dtype>
 void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,

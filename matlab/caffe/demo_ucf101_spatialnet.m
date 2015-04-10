@@ -2,7 +2,8 @@ src_dir = '../../data/ucf101/ucf101_image/';
 list_file = '../../data/ucf101/test1.txt';
 
 model_def_file = '../../examples/twostream/spatialnet_ft_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_34000.caffemodel';
+model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_45000.caffemodel';
+%model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_34000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file, 0);
 

@@ -4,7 +4,7 @@ list_file = '../../data/ucf101/test1.txt';
 
 % get full model weight
 model_def_file = '../../examples/twostream/spatialnet_ft_consilience_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/spatialnet_ft_consilience_iter_35000.caffemodel';
+model_file = '../../examples/twostream/snapshot/spatialnet_ft_consilience_B_1_iter_40000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file, 2);
 

@@ -1,0 +1,11 @@
+net: "examples/twostream/spatialnet.prototxt"
+test_iter: 1000
+test_interval: 2000
+base_lr: 0.001
+display: 100
+max_iter: 120000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 120000
+snapshot_prefix: "examples/twostream/snapshot/spatialnet"
+solver_mode: GPU

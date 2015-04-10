@@ -205,7 +205,6 @@ void Solver<Dtype>::Solve(const char* resume_file) {
       smoothed_loss += (loss - losses[idx]) / average_loss;
       losses[idx] = loss;
     }
-    LOG(INFO) << "Iteration " << iter_ << ", loss = " << smoothed_loss;
     if (display) {
       LOG(INFO) << "Iteration " << iter_ << ", loss = " << smoothed_loss;
       const vector<Blob<Dtype>*>& result = net_->output_blobs();

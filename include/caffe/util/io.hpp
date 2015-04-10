@@ -91,7 +91,7 @@ inline void WriteProtoToBinaryFile(
 
 bool ReadFlowMagnitude(const string& flow_dir, const string& filename, 
 		const int start_frame, const int height, const int width, Datum* datum,
-		struct transform_param* t_param);
+		struct transform_param* t_param, const int flow_size);
 
 bool ReadFlowToDatum(const string& root_dir, const string& filename, const int label, 
 		const int start_frame, const int nchannels, const int height, const int width, Datum* datum);

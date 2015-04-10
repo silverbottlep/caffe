@@ -30,6 +30,7 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
   const int num_channels = consilience_data_param.num_channels();
 	string image_dir = consilience_data_param.image_dir();
 	string flow_dir = consilience_data_param.flow_dir();
+	const int flow_size  = consilience_data_param.flow_size();
 
   CHECK((new_height == 0 && new_width == 0) ||
       (new_height > 0 && new_width > 0)) << "Current implementation requires "
@@ -83,7 +84,7 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
 				new_height, new_width, &datum));
 		
 	CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
-		1, new_height, new_width, &flow_datum, &t_param));
+		1, new_height, new_width, &flow_datum, &t_param, flow_size));
 
   // image
   const int crop_size = this->layer_param_.transform_param().crop_size();
@@ -93,15 +94,15 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
     this->prefetch_data_.Reshape(batch_size, datum.channels(), crop_size,
                                  crop_size);
 		// flow_data
-    (*top)[2]->Reshape(batch_size, 1, 13, 13);
-    this->prefetch_data2_.Reshape(batch_size, 1, 13, 13);
+    (*top)[2]->Reshape(batch_size, 1, flow_size, flow_size);
+    this->prefetch_data2_.Reshape(batch_size, 1, flow_size, flow_size);
   } else {
     (*top)[0]->Reshape(batch_size, datum.channels(), datum.height(),
                        datum.width());
     this->prefetch_data_.Reshape(batch_size, datum.channels(), datum.height(),
         datum.width());
-    (*top)[2]->Reshape(batch_size, 1, 13, 13);
-    this->prefetch_data2_.Reshape(batch_size, 1, 13, 13);
+    (*top)[2]->Reshape(batch_size, 1, flow_size, flow_size);
+    this->prefetch_data2_.Reshape(batch_size, 1, flow_size, flow_size);
   }
   LOG(INFO) << "output data1 size: " << (*top)[0]->num() << ","
       << (*top)[0]->channels() << "," << (*top)[0]->height() << ","
@@ -167,7 +168,7 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 
 		// read optical flow image, crop it, mirroring, resize it to 13,13(conv5)
 		CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
-					start_frame, new_height, new_width, &flow_datum, &t_param));
+					start_frame, new_height, new_width, &flow_datum, &t_param, flow_height));
 		const string& flow_data = flow_datum.data();
 		for (int h = 0; h < flow_height; ++h) {
 			for (int w = 0; w < flow_width; ++w) {

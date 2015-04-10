@@ -73,7 +73,7 @@ void WriteProtoToBinaryFile(const Message& proto, const char* filename) {
 
 bool ReadFlowMagnitude(const string& flow_dir, const string& filename, 
 		const int start_frame, const int height, const int width, Datum* datum, 
-		struct transform_param* t_param)
+		struct transform_param* t_param, const int flow_size)
 {
   cv::Mat cv_img;
   int cv_read_flag = CV_LOAD_IMAGE_GRAYSCALE;
@@ -109,7 +109,7 @@ bool ReadFlowMagnitude(const string& flow_dir, const string& filename,
 		// horizontal flip
 		cv::flip(transformed_img, transformed_img, 1);
 	}
-	cv::resize(transformed_img, transformed_img, cv::Size(13,13));
+	cv::resize(transformed_img, transformed_img, cv::Size(flow_size,flow_size));
 
 	datum->set_channels(1);
 	datum->set_height(transformed_img.rows);

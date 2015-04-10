@@ -10,5 +10,5 @@ max_iter: 45000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 5000
-snapshot_prefix: "examples/twostream/snapshot/spatialnet_ft"
+snapshot_prefix: "examples/twostream/snapshot/spatialnet_ft_E"
 solver_mode: GPU

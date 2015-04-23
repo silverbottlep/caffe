@@ -42,9 +42,15 @@ void VideoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << "Could not open image list (filename: \""+ source + "\")";
   string filename;
   int label, nframes;
-  while (infile >> filename >> label >> nframes) {
-    lines_.push_back(std::make_pair(std::make_pair(filename, label), nframes));
-    //lines_.push_back(std::make_pair(filename, label));
+	float min, max;
+	struct data_item video_item;
+  while (infile >> filename >> label >> nframes >> min >> max) {
+		video_item.filename = filename;
+		video_item.label = label;
+		video_item.nframes = nframes;
+		video_item.min = min;
+		video_item.max = max;
+    lines_.push_back(video_item);
   }
 
   if (this->layer_param_.video_data_param().shuffle()) {
@@ -71,14 +77,14 @@ void VideoDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   Datum datum;
 	if (video_data_param.input_type() == caffe::VideoDataParameter_InputType_IMAGE) {
 		path framename(root_dir);
-		framename /= lines_[lines_id_].first.first; 
-		framename /= lines_[lines_id_].first.first + "_f0001.jpg";
-		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+		framename /= lines_[lines_id_].filename;
+		framename /= lines_[lines_id_].filename + "_f0001.jpg";
+		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].label, 
 					new_height, new_width, &datum));
 	}
 	else {
-		CHECK(ReadFlowToDatum(root_dir, lines_[lines_id_].first.first, 
-			lines_[lines_id_].first.second, 1, num_channels, 
+		CHECK(ReadFlowToDatum(root_dir, lines_[lines_id_].filename, 
+			lines_[lines_id_].label, 1, num_channels, 
 			new_height, new_width, &datum));
 	}
 
@@ -134,7 +140,7 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     // get a blob
     CHECK_GT(lines_size, lines_id_);
-		int nframes = lines_[lines_id_].second;
+		int nframes = lines_[lines_id_].nframes;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
 		
 		if (video_data_param.input_type() == caffe::VideoDataParameter_InputType_IMAGE) {
@@ -142,25 +148,52 @@ void VideoDataLayer<Dtype>::InternalThreadEntry() {
 			char numstr[7]={0};
 			sprintf(numstr,"_f%04d",start_frame);
 			string numstr_string(numstr);
-			framename /= lines_[lines_id_].first.first; 
-			framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";
-			CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+			framename /= lines_[lines_id_].filename;
+			framename /= lines_[lines_id_].filename + numstr_string + ".jpg";
+			CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].label, 
 						new_height, new_width, &datum));
 			
 			struct transform_param t_param;
 			this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
 		}
 		else {
-			if (!ReadFlowToDatum(root_dir,lines_[lines_id_].first.first, 
-						lines_[lines_id_].first.second, start_frame, num_channels, 
+			if (!ReadFlowToDatum(root_dir,lines_[lines_id_].filename, 
+						lines_[lines_id_].label, start_frame, num_channels, 
 						new_height, new_width, &datum)){
 				continue;
 			}
-			this->data_transformer_.FlowTransform(item_id, datum, this->mean_, top_data);
+			this->data_transformer_.FlowTransform(item_id, datum, lines_[lines_id_].min, lines_[lines_id_].max, this->mean_, top_data);
 		}
 
+	//int height = this->prefetch_data_.height();
+	//int width = this->prefetch_data_.width();
+
+//		for (int h = 100; h < 113; ++h) {
+//			for (int w = 100; w < 113; ++w) {
+//				int top_index = (item_id*height + h) * width + w;
+//				int data_index = h*width + w;
+//				//top_data[top_index] =
+//					//static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+//			}
+//			if (item_id == 0){
+//				LOG(INFO) << top_data[(item_id*height + h) * width + 0]
+//					<< " " << top_data[(item_id*height + h) * width + 1]
+//					<< " " << top_data[(item_id*height + h) * width + 2]
+//					<< " " << top_data[(item_id*height + h) * width + 3]
+//					<< " " << top_data[(item_id*height + h) * width + 4]
+//					<< " " << top_data[(item_id*height + h) * width + 5]
+//					<< " " << top_data[(item_id*height + h) * width + 6]
+//					<< " " << top_data[(item_id*height + h) * width + 7]
+//					<< " " << top_data[(item_id*height + h) * width + 8]
+//					<< " " << top_data[(item_id*height + h) * width + 9]
+//					<< " " << top_data[(item_id*height + h) * width + 10]
+//					<< " " << top_data[(item_id*height + h) * width + 11]
+//					<< " " << top_data[(item_id*height + h) * width + 12];
+//			}
+//		}
     top_label[item_id] = datum.label();
-		//LOG(INFO) << lines_[lines_id_].first.first << " label:" << top_label[item_id] << " nframes: " << nframes << " start_frame: " << start_frame;
+		//LOG(INFO) << lines_[lines_id_].filename << " label:" << top_label[item_id] << " nframes: " << nframes << " start_frame: " << start_frame << " min, max: " << lines_[lines_id_].min << ", " << lines_[lines_id_].max;
+		
     // go to the next iter
     lines_id_++;
     if (lines_id_ >= lines_size) {

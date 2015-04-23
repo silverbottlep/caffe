@@ -279,6 +279,14 @@ class ImageDataLayer : public BasePrefetchingDataLayer<Dtype> {
  *
  * TODO(dox): thorough documentation for Forward and proto params.
  */
+struct data_item {
+		std::string filename;
+		int	label;
+		int nframes;
+		float min;
+		float max;
+};
+
 template <typename Dtype>
 class VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
@@ -299,7 +307,8 @@ class VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void ShuffleImages();
   virtual void InternalThreadEntry();
 
-  vector< std::pair< std::pair<std::string, int>, int> > lines_;
+  //vector< std::pair< std::pair<std::string, int>, int> > lines_;
+  vector<struct data_item> lines_;
   int lines_id_;
 };
 

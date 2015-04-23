@@ -1,5 +1,7 @@
-load('rgb_consilience_result.mat');
-load('rgb_result.mat');
+%load('rgb_consilience_result.mat');
+%load('rgb_result.mat');
+load('rgb_vgg19_consilience_result.mat');
+load('rgb_vgg19_result.mat');
 load('flow_result.mat');
 
 alpha = 0.1:0.1:0.9;
@@ -9,8 +11,8 @@ flow_accuracy = 0;
 total_item = length(rgb_consilience_result);
 for i=1:total_item
 	label = rgb_consilience_result(i).label;
-	rgb_feat = rgb_consilience_result(i).feat;
-	%rgb_feat = rgb_result(i).feat;
+	%rgb_feat = rgb_consilience_result(i).feat;
+	rgb_feat = rgb_result(i).feat;
 	
 	rgb_feat = sum(rgb_feat,2)/size(rgb_feat,2);
 	[max_s, idx] = max(rgb_feat);

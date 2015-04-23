@@ -15,13 +15,13 @@ type: VIDEO_DATA
     source: "data/ucf101/train1.txt"
     root_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 256
+    batch_size: 128
 		num_channels: 10
 		input_type: FLOW
   }
   transform_param {
     crop_size: 224
-		mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
+#mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
     mirror: true
   }
   include: { phase: TRAIN }
@@ -47,7 +47,7 @@ type: VIDEO_DATA
   }
   transform_param {
     crop_size: 224
-		mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
+#mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
     mirror: false
   }
   include: { phase: TEST }

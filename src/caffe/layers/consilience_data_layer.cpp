@@ -27,7 +27,6 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
   ConsilienceDataParameter consilience_data_param = this->layer_param_.consilience_data_param();
   const int new_height = consilience_data_param.new_height();
   const int new_width  = consilience_data_param.new_width();
-  const int num_channels = consilience_data_param.num_channels();
 	string image_dir = consilience_data_param.image_dir();
 	string flow_dir = consilience_data_param.flow_dir();
 	const int flow_size  = consilience_data_param.flow_size();
@@ -72,7 +71,6 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
   // Read a data point, and use it to initialize the top blob.
   Datum datum;
   Datum flow_datum;
-	float mag[36];
 	struct transform_param t_param;
 	t_param.h_off = 0;
 	t_param.w_off = 0;
@@ -154,7 +152,6 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		int nframes = lines_[lines_id_].second;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
 		struct transform_param t_param;
-		float mag[36];
 		
 		path framename(image_dir);
 		char numstr[7]={0};
@@ -170,6 +167,9 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
 					start_frame, new_height, new_width, &flow_datum, &t_param, flow_height));
 		const string& flow_data = flow_datum.data();
+//		if (item_id == 0){
+//			LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off << " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored << " flow_size: " << flow_height;
+//		}
 		for (int h = 0; h < flow_height; ++h) {
 			for (int w = 0; w < flow_width; ++w) {
 				int top_index = (item_id*flow_height + h) * flow_width + w;
@@ -177,8 +177,22 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 				top_data2[top_index] =
 					static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
 			}
+//			if (item_id == 0){
+//				LOG(INFO) << top_data2[(item_id*flow_height + h) * flow_width + 0]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 1]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 2]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 3]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 4]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 5]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 6]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 7]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 8]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 9]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 10]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 11]
+//					<< " " << top_data2[(item_id*flow_height + h) * flow_width + 12];
+//			}
 		}
-		//LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off << " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored << " flow_size: " << flow_size;
 //		this->data_transformer_.ConsilienceTransform(item_id, flow_datum, 
 //						top_data2, t_param);
 //		LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off

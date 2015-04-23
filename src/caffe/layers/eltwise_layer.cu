@@ -37,6 +37,11 @@ void EltwiseLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   int* mask = NULL;
   const int count = (*top)[0]->count();
   Dtype* top_data = (*top)[0]->mutable_gpu_data();
+//  void* cpu_ptr;
+//	Dtype* cpu_data = (Dtype*)cpu_ptr;
+//	int data_size = (*top)[0]->data()->size();
+//	CaffeMallocHost(&cpu_ptr, data_size);
+//	caffe_memset(data_size, 0, cpu_ptr);
   switch (op_) {
   case EltwiseParameter_EltwiseOp_PROD:
     caffe_gpu_mul(count, bottom[0]->gpu_data(), bottom[1]->gpu_data(),
@@ -66,6 +71,25 @@ void EltwiseLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   default:
     LOG(FATAL) << "Unknown elementwise operation.";
   }
+//	caffe_memset(data_size, 0, cpu_ptr);
+//  caffe_gpu_memcpy(data_size, top_data, cpu_ptr);
+//	LOG(INFO) << "AFTER";
+//	for (int h = 0; h < (*top)[0]->height(); ++h) {
+//		LOG(INFO) <<	((float*)cpu_ptr)[(*top)[0]->width()*h + 0]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 1]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 2]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 3]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 4]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 5]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 6]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 7]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 8]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 9]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 10]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 11]
+//				<< " " << ((float*)cpu_ptr)[(*top)[0]->width()*h + 12];
+//	}
+//  CaffeFreeHost(cpu_ptr);
 }
 
 template <typename Dtype>

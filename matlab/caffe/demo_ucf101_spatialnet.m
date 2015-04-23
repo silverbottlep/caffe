@@ -1,11 +1,18 @@
 src_dir = '../../data/ucf101/ucf101_image/';
 list_file = '../../data/ucf101/test1.txt';
 
-model_def_file = '../../examples/twostream/spatialnet_ft_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_45000.caffemodel';
-%model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_34000.caffemodel';
+%model_def_file = '../../examples/twostream/spatialnet_ft_deploy.prototxt';
+%model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_45000.caffemodel';
+%output_name = 'rgb_result.mat';
+%batch = 1;
+
+model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_deploy.prototxt';
+model_file = '../../examples/twostream/snapshot/spatialnet_vgg19_ft_iter_60000.caffemodel';
+output_name = 'rgb_vgg19_result2.mat';
+batch = 5;
+
 use_gpu = true;
-matcaffe_init(use_gpu, model_def_file, model_file, 0);
+matcaffe_init(use_gpu, model_def_file, model_file, 2);
 
 image_mean = imread('../../data/ucf101/ucf101_rgb_mean.binaryproto.jpg');
 IMAGE_MEAN = single(image_mean(:,:,[3 2 1]));
@@ -26,29 +33,33 @@ fclose(list_fid);
 accuracy = 0;
 CROPPED_DIM = 224;
 nsamples = 25;
-input = zeros(CROPPED_DIM, CROPPED_DIM, 3, nsamples*10, 'single');
+input = zeros(CROPPED_DIM, CROPPED_DIM, 3, (nsamples/batch)*10, 'single');
 for i=1:num_item
+	scores = [];
 	item = char(item_name{i});
 
 	gap = floor(single(nframes(i)) / single(nsamples));
-	for j=1:nsamples
-		frame_num = (j-1)*gap+1;
-		filename = strcat(src_dir, item, '/', item, '_f', ...
-			num2str(frame_num,'%04u'), '.jpg');
-		
-		im = imread(char(filename));
-		im = single(im);
-		if size(im,3) == 1
-				im = cat(3,im,im,im);
+	for b=1:batch
+		for j=1:nsamples/batch
+			frame_num = ((b-1)*(nsamples/batch)+j-1)*gap+1;
+			filename = strcat(src_dir, item, '/', item, '_f', ...
+				num2str(frame_num,'%04u'), '.jpg');
+			
+			im = imread(char(filename));
+			im = single(im);
+			if size(im,3) == 1
+					im = cat(3,im,im,im);
+			end
+			im = im(:,:,[3 2 1]) - IMAGE_MEAN;
+			images{j} = prepare_image_ucf101(im);
 		end
-		im = im(:,:,[3 2 1]) - IMAGE_MEAN;
-		images{j} = prepare_image_ucf101(im);
+		for j=1:nsamples/batch
+			input(:,:,:,(j-1)*10+1:(j-1)*10+10) = images{j};
+		end
+		output_data = caffe('forward', {input});
+		o = squeeze(output_data{1});
+		scores = [scores o];
 	end
-	for j=1:nsamples
-		input(:,:,:,(j-1)*10+1:(j-1)*10+10) = images{j};
-	end
-	output_data = caffe('forward', {input});
-	scores = squeeze(output_data{1});
 	s = sum(scores,2)/size(scores,2);
 	[max_s, idx] = max(s);
 	output_label(i) = idx-1;
@@ -68,5 +79,5 @@ for i=1:num_item
 			item, i, num_item, (accuracy/i)*100, output_label(i), max_s, item_label(i));
 end
 
-save('rgb_result.mat', 'rgb_result');
+save(output_name, 'rgb_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

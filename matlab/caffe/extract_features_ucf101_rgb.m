@@ -1,10 +1,11 @@
 src_dir = '../../data/ucf101/ucf101_image/';
+out_dir = '../../data/ucf101/ucf101_rgb_feat/';
 list_file = '../../data/ucf101/train1.txt';
 
 model_def_file = '../../examples/twostream/spatialnet_ft_deploy_conv5.prototxt';
-model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_34000.caffemodel';
+model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_45000.caffemodel';
 use_gpu = true;
-matcaffe_init(use_gpu, model_def_file, model_file, 2);
+matcaffe_init(use_gpu, model_def_file, model_file, 0);
 
 image_mean = imread('../../data/ucf101/ucf101_rgb_mean.binaryproto.jpg');
 IMAGE_MEAN = single(image_mean(:,:,[3 2 1]));
@@ -24,13 +25,11 @@ fclose(list_fid);
 
 accuracy = 0;
 CROPPED_DIM = 224;
-input = zeros(CROPPED_DIM, CROPPED_DIM, 3, 10, 'single');
+input = zeros(256, 340, 3, 1, 'single');
 for i=1:num_item
 	item = char(item_name{i});
-	input_idx = 0;
 	feat = [];
 	for j=1:nframes(i)
-		input_idx = input_idx+1;
 		filename = strcat(src_dir, item, '/', item, '_f', ...
 			num2str(j,'%04u'), '.jpg');
 		
@@ -40,21 +39,28 @@ for i=1:num_item
 				im = cat(3,im,im,im);
 		end
 		im = im(:,:,[3 2 1]) - IMAGE_MEAN;
-		input = prepare_image_ucf101(im);
+		input = permute(im,[2 1 3]);
 		output_data = caffe('forward', {input});
-		scores = squeeze(output_data{1});
-		feat = [feat scores];
+		conv5 = permute(output_data{1}, [2 1 3]);
+		conv5 = reshape(conv5,[size(conv5,1) size(conv5,2)*size(conv5,3)]);
+		%feat(:,:,:,j) = single(conv5);
+		feat = [feat; conv5];
 	end
+	feat = sparse(double(feat));
 
-	feat_rgb_conv5(i).feat = feat;
-	feat_rgb_conv5(i).item = item;
-	feat_rgb_conv5(i).nframes = nframes(i);
-	feat_rgb_conv5(i).label = item_label(i);
+%	feat_rgb_conv5(i).feat = feat;
+%	feat_rgb_conv5(i).item = item;
+%	feat_rgb_conv5(i).nframes = nframes(i);
+%	feat_rgb_conv5(i).label = item_label(i);
 
-	fprintf('processing %s(%d/%d) \n', item, i, num_item );
-	if mode(i,1000) == 0
-		save('features_rgb_conv5.mat','feat_rgb_conv5');
-	end
+	fprintf('processing %s(%d/%d) num_frame: %d\n', item, i, num_item, nframes(i) );
+	outfile = [out_dir item '.mat'];
+	save(outfile, 'feat','-v7.3');
+%	if mode(i,1000) == 0
+%		save('features_rgb_conv5.mat','feat_rgb_conv5');
+%	end
 end
 
-save('features_rgb_conv5.mat','feat_rgb_conv5');
+%save -v7.3 'temp.mat' 'feat';
+%hdf5write('temp.h5','./',feat);
+%save('features_rgb_conv5.mat','feat_rgb_conv5');

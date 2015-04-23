@@ -162,6 +162,7 @@ void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id,
 template<typename Dtype>
 void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
                                        const Datum& datum,
+																			 float min, float max,
                                        const Dtype* mean,
                                        Dtype* transformed_data) {
   const string& data = datum.data();
@@ -173,6 +174,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
   const int crop_size = param_.crop_size();
   const bool mirror = param_.mirror();
   const Dtype scale = param_.scale();
+	Dtype flow_scale = (max - min)/255;
 
 	if (mirror && crop_size == 0) {
     LOG(FATAL) << "Current implementation requires mirror and crop_size to be "
@@ -200,7 +202,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
             int top_index = ((batch_item_id * channels + c) * crop_size + h)
                 * crop_size + (crop_size - 1 - w);
             Dtype datum_element =
-                static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
+                static_cast<Dtype>(static_cast<uint8_t>(data[data_index]))*flow_scale + min;
             transformed_data[top_index] =
                 (datum_element - mean[mean_index]) * scale;
           }
@@ -216,7 +218,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
             int data_index = (c * height + h + h_off) * width + w + w_off;
             int mean_index = ((c%2) * height + h + h_off) * width + w + w_off;
             Dtype datum_element =
-                static_cast<Dtype>(static_cast<uint8_t>(data[data_index]));
+                static_cast<Dtype>(static_cast<uint8_t>(data[data_index]))*flow_scale + min;
 						transformed_data[top_index] =
                 (datum_element - mean[mean_index]) * scale;
           }
@@ -228,7 +230,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
     if (data.size()) {
       for (int j = 0; j < size; ++j) {
         Dtype datum_element =
-            static_cast<Dtype>(static_cast<uint8_t>(data[j]));
+            static_cast<Dtype>(static_cast<uint8_t>(data[j]))*flow_scale + min;
         transformed_data[j + batch_item_id * size] =
             (datum_element) * scale;
 //        transformed_data[j + batch_item_id * size] =
@@ -237,7 +239,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
     } else {
       for (int j = 0; j < size; ++j) {
         transformed_data[j + batch_item_id * size] =
-            (datum.float_data(j)) * scale;
+            (datum.float_data(j)*flow_scale + min) * scale;
 //        transformed_data[j + batch_item_id * size] =
 //            (datum.float_data(j) - mean[j]) * scale;
       }

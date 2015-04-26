@@ -217,6 +217,10 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new VideoDataLayer<Dtype>(param);
   case LayerParameter_LayerType_CONSILIENCE_DATA:
     return new ConsilienceDataLayer<Dtype>(param);
+  case LayerParameter_LayerType_CONSILIENCE_HDF5_DATA:
+    return new ConsilienceHDF5DataLayer<Dtype>(param);
+  case LayerParameter_LayerType_CONSILIENCE:
+    return new ConsilienceLayer<Dtype>(param);
   case LayerParameter_LayerType_IM2COL:
     return new Im2colLayer<Dtype>(param);
   case LayerParameter_LayerType_INFOGAIN_LOSS:

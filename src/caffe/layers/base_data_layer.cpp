@@ -51,6 +51,22 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     data_mean_.Reshape(1, datum_channels_, datum_height_, datum_width_);
   }
   mean_ = data_mean_.cpu_data();
+  // check if we want to have flow mean
+  if (transform_param_.has_flow_mean_file()) {
+    const string& flow_mean_file = transform_param_.flow_mean_file();
+    LOG(INFO) << "Loading mean file from" << flow_mean_file;
+    BlobProto blob_proto;
+    ReadProtoFromBinaryFileOrDie(flow_mean_file.c_str(), &blob_proto);
+    flow_data_mean_.FromProto(blob_proto);
+    CHECK_GE(flow_data_mean_.num(), 1);
+    //CHECK_GE(data_mean_.channels(), datum_channels_);
+    CHECK_GE(flow_data_mean_.height(), datum_height_);
+    CHECK_GE(flow_data_mean_.width(), datum_width_);
+  } else {
+    // Simply initialize an all-empty mean.
+    data_mean_.Reshape(1, datum_channels_, datum_height_, datum_width_);
+  }
+  flow_mean_ = flow_data_mean_.cpu_data();
   data_transformer_.InitRand();
 }
 

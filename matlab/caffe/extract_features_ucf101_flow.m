@@ -1,5 +1,6 @@
 src_dir = '../../data/ucf101/ucf101_opt/';
 list_file = '../../data/ucf101/train1.txt';
+%list_file = '../../data/ucf101/test1.txt';
 
 model_def_file = '../../examples/twostream/temporalnet_deploy_pool5.prototxt';
 model_file = '../../examples/twostream/snapshot/temporalnet_iter_200000.caffemodel';

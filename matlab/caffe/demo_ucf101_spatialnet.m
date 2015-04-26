@@ -8,7 +8,7 @@ list_file = '../../data/ucf101/test1.txt';
 
 model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_deploy.prototxt';
 model_file = '../../examples/twostream/snapshot/spatialnet_vgg19_ft_iter_60000.caffemodel';
-output_name = 'rgb_vgg19_result2.mat';
+output_name = 'rgb_vgg19_result.mat';
 batch = 5;
 
 use_gpu = true;

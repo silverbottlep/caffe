@@ -62,7 +62,9 @@ class BaseDataLayer : public Layer<Dtype> {
   int datum_width_;
   int datum_size_;
   Blob<Dtype> data_mean_;
+  Blob<Dtype> flow_data_mean_;
   const Dtype* mean_;
+  const Dtype* flow_mean_;
   Caffe::Phase phase_;
   bool output_labels_;
   bool additional_data_;
@@ -309,6 +311,37 @@ class VideoDataLayer : public BasePrefetchingDataLayer<Dtype> {
 
   //vector< std::pair< std::pair<std::string, int>, int> > lines_;
   vector<struct data_item> lines_;
+  int lines_id_;
+};
+
+/**
+ * @brief Provides data to the Net from video files(all frames are stored in jpeg)
+ *
+ * TODO(dox): thorough documentation for Forward and proto params.
+ */
+template <typename Dtype>
+class ConsilienceHDF5DataLayer : public BasePrefetchingDataLayer<Dtype> {
+ public:
+  explicit ConsilienceHDF5DataLayer(const LayerParameter& param)
+      : BasePrefetchingDataLayer<Dtype>(param) {}
+  virtual ~ConsilienceHDF5DataLayer();
+  virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      vector<Blob<Dtype>*>* top);
+
+  virtual inline LayerParameter_LayerType type() const {
+    return LayerParameter_LayerType_IMAGE_DATA;
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 0; }
+  virtual inline int ExactNumTopBlobs() const { return 3; }
+
+ protected:
+  shared_ptr<Caffe::RNG> prefetch_rng_;
+  virtual void ShuffleImages();
+  virtual void InternalThreadEntry();
+  virtual void LoadHDF5FileData(const string filename, 
+			const int start_frame);
+
+  vector< std::pair< std::pair<std::string, int>, int> > lines_;
   int lines_id_;
 };
 

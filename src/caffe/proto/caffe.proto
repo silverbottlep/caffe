@@ -255,6 +255,8 @@ message LayerParameter {
     MEMORY_DATA = 29;
     VIDEO_DATA = 43;
     CONSILIENCE_DATA = 44;
+    CONSILIENCE_HDF5_DATA = 45;
+		CONSILIENCE = 46;
     MULTINOMIAL_LOGISTIC_LOSS = 16;
     MVN = 34;
     POOLING = 17;
@@ -313,6 +315,8 @@ message LayerParameter {
   optional ImageDataParameter image_data_param = 15;
   optional VideoDataParameter video_data_param = 43;
   optional ConsilienceDataParameter consilience_data_param = 44;
+  optional ConsilienceHDF5DataParameter consilience_hdf5_data_param = 45;
+  optional ConsilienceParameter consilience_param = 46;
   optional InfogainLossParameter infogain_loss_param = 16;
   optional InnerProductParameter inner_product_param = 17;
   optional LRNParameter lrn_param = 18;
@@ -354,6 +358,7 @@ message TransformationParameter {
   // Specify if we would like to randomly crop an image.
   optional uint32 crop_size = 3 [default = 0];
   optional string mean_file = 4;
+  optional string flow_mean_file = 5;
 }
 
 // Message that stores parameters used by AccuracyLayer
@@ -387,6 +392,32 @@ message ContrastiveLossParameter {
 
 // Message that stores parameters used by ConvolutionLayer
 message ConvolutionParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  // Pad, kernel size, and stride are all given as a single value for equal
+  // dimensions in height and width or as Y, X pairs.
+  optional uint32 pad = 3 [default = 0]; // The padding size (equal in Y, X)
+  optional uint32 pad_h = 9 [default = 0]; // The padding height
+  optional uint32 pad_w = 10 [default = 0]; // The padding width
+  optional uint32 kernel_size = 4; // The kernel size (square)
+  optional uint32 kernel_h = 11; // The kernel height
+  optional uint32 kernel_w = 12; // The kernel width
+  optional uint32 group = 5 [default = 1]; // The group size for group conv
+  optional uint32 stride = 6 [default = 1]; // The stride (equal in Y, X)
+  optional uint32 stride_h = 13; // The stride height
+  optional uint32 stride_w = 14; // The stride width
+  optional FillerParameter weight_filler = 7; // The filler for the weight
+  optional FillerParameter bias_filler = 8; // The filler for the bias
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 15 [default = DEFAULT];
+}
+
+// Message that stores parameters used by ConvolutionLayer
+message ConsilienceParameter {
   optional uint32 num_output = 1; // The number of outputs for the layer
   optional bool bias_term = 2 [default = true]; // whether to have bias terms
   // Pad, kernel size, and stride are all given as a single value for equal
@@ -572,7 +603,6 @@ message ConsilienceDataParameter {
   optional string image_dir= 2;
   // Specify the root folder that contains images.
   optional string flow_dir= 12;
-  optional string minmax_dir= 13;
   // Specify the batch size.
   optional uint32 batch_size = 4;
   // The rand_skip variable is for the data layer to skip a few data points
@@ -588,6 +618,26 @@ message ConsilienceDataParameter {
 	// How many frames? default is consecutive 10 frames
   optional uint32 num_channels = 11 [default = 10];
   optional uint32 flow_size = 14 [default = 13];
+  enum InputType{
+    OPTFLOW = 0;
+    CONSILIENCE = 1;
+  }
+	// flow(0) jpeg(1)
+  optional InputType input_type = 15 [default = OPTFLOW ];
+}
+
+// Message that stores parameters used by VideoDataLayer
+message ConsilienceHDF5DataParameter {
+  // Specify the data source.
+  optional string source = 1;
+  // Specify the root folder that contains images.
+  optional string rgb_dir= 2;
+  // Specify the root folder that contains images.
+  optional string flow_dir= 12;
+  // Specify the batch size.
+  optional uint32 batch_size = 4;
+  // Whether or not ImageLayer should shuffle the list of files at every epoch.
+  optional bool shuffle = 8 [default = false];
 }
 
 // Message that stores parameters InfogainLossLayer

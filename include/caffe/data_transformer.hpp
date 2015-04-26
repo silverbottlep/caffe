@@ -45,7 +45,7 @@ class DataTransformer {
   void FlowTransform(const int batch_item_id, const Datum& datum, float min, float max,
                  const Dtype* mean, Dtype* transformed_data);
 	void ConsilienceTransform(const int batch_item_id, 
-					const Datum& flow_datum, Dtype* transformed_flow_data, 
+					const Datum& flow_datum, const Dtype* mean, Dtype* transformed_flow_data, 
 					struct transform_param& t_param);
 
  protected:

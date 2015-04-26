@@ -95,7 +95,7 @@ void DataTransformer<Dtype>::Transform(const int batch_item_id,
 
 template<typename Dtype>
 void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id, 
-					const Datum& flow_datum, Dtype* transformed_flow_data, 
+					const Datum& flow_datum, const Dtype* mean, Dtype* transformed_flow_data, 
 					struct transform_param& t_param) {
   const string& flow_data = flow_datum.data();
   const int channels = flow_datum.channels();
@@ -121,10 +121,12 @@ void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id,
         for (int h = 0; h < crop_size; ++h) {
           for (int w = 0; w < crop_size; ++w) {
             int data_index = (c * height + h + h_off) * width + w + w_off;
+            int mean_index = ((c%2) * height + h + h_off) * width + w + w_off;
             int top_index = ((batch_item_id * channels + c) * crop_size + h)
                 * crop_size + (crop_size - 1 - w);
             transformed_flow_data[top_index] =
-                static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+                static_cast<Dtype>(static_cast<uint8_t>
+										(flow_data[data_index] - mean[mean_index]));
           }
         }
       }
@@ -136,23 +138,27 @@ void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id,
             int top_index = ((batch_item_id * channels + c) * crop_size + h)
                 * crop_size + w;
             int data_index = (c * height + h + h_off) * width + w + w_off;
+            int mean_index = ((c%2) * height + h + h_off) * width + w + w_off;
             transformed_flow_data[top_index] =
-                static_cast<Dtype>(static_cast<uint8_t>(flow_data[data_index]));
+                static_cast<Dtype>(static_cast<uint8_t>(
+											flow_data[data_index] - mean[mean_index]));
           }
         }
       }
     }
   } else {
+    // NOTICE!! WE SHOULD CONSIDER MEAN INDEX HERE LATER
     // we will prefer to use data() first, and then try float_data()
     if (flow_data.size()) {
       for (int j = 0; j < size; ++j) {
         transformed_flow_data[j + batch_item_id * size] =
-            static_cast<Dtype>(static_cast<uint8_t>(flow_data[j]));
+            static_cast<Dtype>(static_cast<uint8_t>(
+									flow_data[j]) - mean[j]);
       }
     } else {
       for (int j = 0; j < size; ++j) {
         transformed_flow_data[j + batch_item_id * size] =
-            flow_datum.float_data(j);
+            flow_datum.float_data(j) - mean[j];
       }
     }
   }
@@ -226,6 +232,7 @@ void DataTransformer<Dtype>::FlowTransform(const int batch_item_id,
       }
     }
   } else {
+    // NOTICE!! WE SHOULD CONSIDER MEAN INDEX HERE LATER
     // we will prefer to use data() first, and then try float_data()
     if (data.size()) {
       for (int j = 0; j < size; ++j) {

@@ -4,21 +4,17 @@ from caffe.proto.caffe_pb2 import *
 from google import protobuf
 
 model_root = '/home/eunbyung/Works/src/caffe/examples/consilience/' 
+#spatialnet_proto_file = model_root + 'spatialnet_ft.prototxt'
+#temporalnet_proto_file = model_root + 'temporalnet_ft.prototxt'
+spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
 temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
-
-#spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
-#consiliencenet_param_file = model_root + 'snapshot/' + 'consilience.caffemodel'
-#consiliencenet_proto_file = model_root + 'consilience.prototxt'
-
-spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_vgg19.caffemodel'
-consiliencenet_param_file = model_root + 'snapshot/' + 'vgg19_consilience.caffemodel'
-consiliencenet_proto_file = model_root + 'vgg19_consilience_spatial.prototxt'
-
+consiliencenet_proto_file = model_root + 'consilience.prototxt'
+consiliencenet_param_file = model_root + 'snapshot/' + 'consilience.caffemodel'
 
 # loading spatialnet, and build blob lookup dic
+print "Loading blobs from", spatialnet.name
 spatialnet = NetParameter()
 sf = open(spatialnet_param_file,'rb')
-print "Loading blobs from", spatialnet.name
 spatialnet.ParseFromString(sf.read())
 sf.close()
 
@@ -31,9 +27,9 @@ for layer in spatialnet.layers:
         print "-", new_name
 
 # loading temporalnet, and build blob lookup dic
+print "Loading blobs from", temporalnet.name
 temporalnet = NetParameter()
 tf = open(temporalnet_param_file,'rb')
-print "Loading blobs from", temporalnet.name
 temporalnet.ParseFromString(tf.read())
 tf.close()
 

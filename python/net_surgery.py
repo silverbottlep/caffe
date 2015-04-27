@@ -3,13 +3,13 @@ import caffe
 from caffe.proto.caffe_pb2 import *
 from google import protobuf
 
-model_root = '/home/eunbyung/Works/src/caffe/examples/twostream/' 
+model_root = '/home/eunbyung/Works/src/caffe/examples/consilience/' 
 #spatialnet_proto_file = model_root + 'spatialnet_ft.prototxt'
 #temporalnet_proto_file = model_root + 'temporalnet_ft.prototxt'
 spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
 temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
-consiliencenet_proto_file = model_root + 'consiliencenet.prototxt'
-consiliencenet_param_file = model_root + 'snapshot/' + 'consiliencenet.caffemodel'
+consiliencenet_proto_file = model_root + 'consilience.prototxt'
+consiliencenet_param_file = model_root + 'snapshot/' + 'consilience.caffemodel'
 
 # loading spatialnet, and build blob lookup dic
 print "Loading blobs from", spatialnet.name

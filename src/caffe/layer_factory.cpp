@@ -221,6 +221,8 @@ Layer<Dtype>* GetLayer(const LayerParameter& param) {
     return new ConsilienceHDF5DataLayer<Dtype>(param);
   case LayerParameter_LayerType_CONSILIENCE:
     return new ConsilienceLayer<Dtype>(param);
+  case LayerParameter_LayerType_NORMALIZE:
+    return new NormalizeLayer<Dtype>(param);
   case LayerParameter_LayerType_IM2COL:
     return new Im2colLayer<Dtype>(param);
   case LayerParameter_LayerType_INFOGAIN_LOSS:

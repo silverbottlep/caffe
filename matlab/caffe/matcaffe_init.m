@@ -1,4 +1,4 @@
-function  matcaffe_init(use_gpu, model_def_file, model_file, gpu_id)
+function  matcaffe_init(use_gpu, model_def_file, model_file)
 % matcaffe_init(model_def_file, model_file, use_gpu)
 % Initilize matcaffe wrapper
 
@@ -32,7 +32,6 @@ fprintf('Done with init\n');
 % set to use GPU or CPU
 if use_gpu
   fprintf('Using GPU Mode\n');
-  caffe('set_device', gpu_id);
   caffe('set_mode_gpu');
 else
   fprintf('Using CPU Mode\n');

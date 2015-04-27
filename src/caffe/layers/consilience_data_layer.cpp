@@ -228,10 +228,8 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 						new_height, new_width, &flow_datum)){
 				continue;
 			}
-			this->data_transformer_.ConsilienceTransform(item_id, datum, this->flow_mean_, top_data2, t_param);
+			this->data_transformer_.ConsilienceTransform(item_id, flow_datum, this->flow_mean_, top_data2, t_param);
 		}
-//		this->data_transformer_.ConsilienceTransform(item_id, flow_datum, 
-//						top_data2, t_param);
 //		LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off
 //			<< " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored;
     top_label[item_id] = datum.label();

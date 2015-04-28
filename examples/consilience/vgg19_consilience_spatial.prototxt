@@ -11,7 +11,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 128
+    batch_size: 64
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -45,7 +45,7 @@ layers {
 }
 
 # spatialnet
-layers { bottom: "data" top: "rgb_conv1_1" name: "rgb_conv1_1" type: CONVOLUTION
+layers { bottom: "rgbdata" top: "rgb_conv1_1" name: "rgb_conv1_1" type: CONVOLUTION
   blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 64 pad: 1 kernel_size: 3 } }
 layers { bottom: "rgb_conv1_1" top: "rgb_conv1_1" name: "relu1_1" type: RELU }
 layers { bottom: "rgb_conv1_1" top: "rgb_conv1_2" name: "rgb_conv1_2" type: CONVOLUTION
@@ -106,7 +106,7 @@ layers { bottom: "rgb_conv5_4" top: "pool5" name: "pool5" type: POOLING
 
 # temporalnet
 layers { bottom: "flowdata" top: "flow_conv1" name: "flow_conv1" type: CONVOLUTION
-  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 } }
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 pad: 1 stride: 2 } }
 layers { bottom: "flow_conv1" top: "flow_conv1" name: "flow_relu1" type: RELU }
 layers { bottom: "flow_conv1" top: "flow_norm1" name: "flow_norm1" type: LRN
   lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
@@ -133,7 +133,7 @@ layers { bottom: "flow_conv5" top: "flow_pool5" name: "flow_pool5" type: POOLING
 layers { bottom: "flow_pool5" top: "flow_pool5" name: "flow_norm" type: NORMALIZE } 
 layers { bottom: "flow_pool5" top: "flow_combined" name: "flow_combine" type: CONVOLUTION
  blobs_lr: 1 convolution_param { num_output: 512 kernel_size: 1 stride: 1 bias_term: false
- weight_filler { type: "gaussian" mean: 1 std: 0.1 } } }
+ weight_filler { type: "gaussian" mean: 0.01 std: 0.0001 } } }
 layers { type: ELTWISE name: 'consilience' bottom: 'pool5' bottom: 'flow_combined' 
 	top: 'consilience' eltwise_param { operation: PROD } }
 

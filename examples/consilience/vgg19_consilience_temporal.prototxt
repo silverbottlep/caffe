@@ -1,4 +1,4 @@
-name: "CONSILIENCENET"
+name: "VGG19_CONSILIENCENET"
 
 layers {
   name: "data"
@@ -11,7 +11,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 24
+    batch_size: 8
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -33,7 +33,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 24
+    batch_size: 8
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -46,35 +46,68 @@ layers {
 }
 
 # spatialnet
-layers { bottom: "rgbdata" top: "rgb_conv1" name: "rgb_conv1" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 } }
-layers { bottom: "rgb_conv1" top: "rgb_conv1" name: "rgb_relu1" type: RELU }
-layers { bottom: "rgb_conv1" top: "rgb_norm1" name: "rgb_norm1" type: LRN
-  lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
-layers { bottom: "rgb_norm1" top: "rgb_pool1" name: "rgb_pool1" type: POOLING
-  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
-layers { bottom: "rgb_pool1" top: "rgb_conv2" name: "rgb_conv2" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 kernel_size: 5 stride: 2 pad: 2 } }
-layers { bottom: "rgb_conv2" top: "rgb_conv2" name: "rgb_relu2" type: RELU }
-layers { bottom: "rgb_conv2" top: "rgb_norm2" name: "rgb_norm2" type: LRN
-  lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
-layers { bottom: "rgb_norm2" top: "rgb_pool2" name: "rgb_pool2" type: POOLING
-  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
-layers { bottom: "rgb_pool2" top: "rgb_conv3" name: "rgb_conv3" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
-layers { bottom: "rgb_conv3" top: "rgb_conv3" name: "rgb_relu3" type: RELU }
-layers { bottom: "rgb_conv3" top: "rgb_conv4" name: "rgb_conv4" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
-layers { bottom: "rgb_conv4" top: "rgb_conv4" name: "rgb_relu4" type: RELU }
-layers { bottom: "rgb_conv4" top: "rgb_conv5" name: "rgb_conv5" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
-layers { bottom: "rgb_conv5" top: "rgb_conv5" name: "rgb_relu5" type: RELU }
-layers { bottom: "rgb_conv5" top: "rgb_pool5" name: "rgb_pool5" type: POOLING
-  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+layers { bottom: "rgbdata" top: "rgb_conv1_1" name: "rgb_conv1_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 64 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv1_1" top: "rgb_conv1_1" name: "relu1_1" type: RELU }
+layers { bottom: "rgb_conv1_1" top: "rgb_conv1_2" name: "rgb_conv1_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 64 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv1_2" top: "rgb_conv1_2" name: "relu1_2" type: RELU }
+layers { bottom: "rgb_conv1_2" top: "pool1" name: "pool1" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool1" top: "rgb_conv2_1" name: "rgb_conv2_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 128 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv2_1" top: "rgb_conv2_1" name: "relu2_1" type: RELU }
+layers { bottom: "rgb_conv2_1" top: "rgb_conv2_2" name: "rgb_conv2_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 128 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv2_2" top: "rgb_conv2_2" name: "relu2_2" type: RELU }
+layers { bottom: "rgb_conv2_2" top: "pool2" name: "pool2" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool2" top: "rgb_conv3_1" name: "rgb_conv3_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_1" top: "rgb_conv3_1" name: "relu3_1" type: RELU }
+layers { bottom: "rgb_conv3_1" top: "rgb_conv3_2" name: "rgb_conv3_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_2" top: "rgb_conv3_2" name: "relu3_2" type: RELU }
+layers { bottom: "rgb_conv3_2" top: "rgb_conv3_3" name: "rgb_conv3_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_3" top: "rgb_conv3_3" name: "relu3_3" type: RELU }
+layers { bottom: "rgb_conv3_3" top: "rgb_conv3_4" name: "rgb_conv3_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_4" top: "rgb_conv3_4" name: "relu3_4" type: RELU }
+layers { bottom: "rgb_conv3_4" top: "pool3" name: "pool3" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool3" top: "rgb_conv4_1" name: "rgb_conv4_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_1" top: "rgb_conv4_1" name: "relu4_1" type: RELU }
+layers { bottom: "rgb_conv4_1" top: "rgb_conv4_2" name: "rgb_conv4_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_2" top: "rgb_conv4_2" name: "relu4_2" type: RELU }
+layers { bottom: "rgb_conv4_2" top: "rgb_conv4_3" name: "rgb_conv4_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_3" top: "rgb_conv4_3" name: "relu4_3" type: RELU }
+layers { bottom: "rgb_conv4_3" top: "rgb_conv4_4" name: "rgb_conv4_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_4" top: "rgb_conv4_4" name: "relu4_4" type: RELU }
+layers { bottom: "rgb_conv4_4" top: "pool4" name: "pool4" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool4" top: "rgb_conv5_1" name: "rgb_conv5_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_1" top: "rgb_conv5_1" name: "relu5_1" type: RELU }
+layers { bottom: "rgb_conv5_1" top: "rgb_conv5_2" name: "rgb_conv5_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_2" top: "rgb_conv5_2" name: "relu5_2" type: RELU }
+layers { bottom: "rgb_conv5_2" top: "rgb_conv5_3" name: "rgb_conv5_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_3" top: "rgb_conv5_3" name: "relu5_3" type: RELU }
+layers { bottom: "rgb_conv5_3" top: "rgb_conv5_4" name: "rgb_conv5_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_4" top: "rgb_conv5_4" name: "relu5_4" type: RELU }
+layers { bottom: "rgb_conv5_4" top: "rgb_pool5" name: "rgb_pool5" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
 
 # temporalnet
 layers { bottom: "flowdata" top: "flow_conv1" name: "flow_conv1" type: CONVOLUTION
-  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 } }
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 pad:1 } }
 layers { bottom: "flow_conv1" top: "flow_conv1" name: "flow_relu1" type: RELU }
 layers { bottom: "flow_conv1" top: "flow_norm1" name: "flow_norm1" type: LRN
   lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
@@ -102,8 +135,11 @@ layers { bottom: "flow_conv5" top: "flow_feat" name: "flow_pool5" type: POOLING
 layers { type: SLICE name: 'rgb_slice' bottom: 'rgb_pool5' 
 	top: "slice1" top: "slice2" top: "slice3" top: "slice4" top: "slice5" top: "slice6" 
 	top: "slice7" top: "slice8" top: "slice9" top: "slice10"
-	slice_param { slice_dim: 0 slice_point: 24 slice_point: 48 slice_point: 72
-	slice_point: 96 slice_point: 120 slice_point: 144 slice_point: 168 slice_point: 192 slice_point: 216 } }
+	slice_param { slice_dim: 0 slice_point: 8 slice_point: 16 slice_point: 24
+	slice_point: 32 slice_point: 40 slice_point: 48 slice_point: 56 slice_point: 64 slice_point: 72 } }
+
+#	slice_param { slice_dim: 0 slice_point: 24 slice_point: 48 slice_point: 72
+#	slice_point: 96 slice_point: 120 slice_point: 144 slice_point: 168 slice_point: 192 slice_point: 216 } }
 
 #	slice_param { slice_dim: 0 slice_point: 16 slice_point: 32 slice_point: 48
 #	slice_point: 64 slice_point: 80 slice_point: 96 slice_point: 112 slice_point: 128 slice_point: 144} }
@@ -124,7 +160,7 @@ layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
  blobs_lr: 1 convolution_param { num_output: 512 kernel_size: 1 stride: 1 bias_term: false
  weight_filler { type: "xavier" } } }
 
- layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb' 
+ layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_feat' 
 	top: 'consilience' eltwise_param { operation: PROD } }
 
 layers {

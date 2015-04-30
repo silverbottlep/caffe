@@ -64,7 +64,7 @@ void BaseDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
     CHECK_GE(flow_data_mean_.width(), datum_width_);
   } else {
     // Simply initialize an all-empty mean.
-    data_mean_.Reshape(1, datum_channels_, datum_height_, datum_width_);
+    flow_data_mean_.Reshape(1, datum_channels_, datum_height_, datum_width_);
   }
   flow_mean_ = flow_data_mean_.cpu_data();
   data_transformer_.InitRand();

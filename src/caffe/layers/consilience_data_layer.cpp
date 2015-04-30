@@ -112,15 +112,15 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
 				lines_[lines_id_].first.second, 1, num_channels, 
 				new_height, new_width, &flow_datum));
 			if (crop_size > 0) {
-				(*top)[0]->Reshape(batch_size, datum.channels(), crop_size, crop_size);
-				this->prefetch_data_.Reshape(batch_size, datum.channels(), crop_size,
+				(*top)[0]->Reshape(batch_size*num_channels, datum.channels(), crop_size, crop_size);
+				this->prefetch_data_.Reshape(batch_size*num_channels, datum.channels(), crop_size,
 																		 crop_size);
 				// flow_data
 				(*top)[2]->Reshape(batch_size, flow_datum.channels(), crop_size, crop_size);
 				this->prefetch_data2_.Reshape(batch_size, flow_datum.channels(), crop_size, crop_size);
 			} else {
-				(*top)[0]->Reshape(batch_size, datum.channels(), datum.height(), datum.width());
-				this->prefetch_data_.Reshape(batch_size, datum.channels(), datum.height(),
+				(*top)[0]->Reshape(batch_size*num_channels, datum.channels(), datum.height(), datum.width());
+				this->prefetch_data_.Reshape(batch_size*num_channels, datum.channels(), datum.height(),
 						datum.width());
 				(*top)[2]->Reshape(batch_size, flow_datum.channels(), flow_datum.height(),
 						flow_datum.width());
@@ -208,6 +208,18 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
 					new_height, new_width, &datum));
 		this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
+
+		for (int frame=1; frame<num_channels; frame++) {
+			path framename(image_dir);
+			char numstr[7]={0};
+			sprintf(numstr,"_f%04d",start_frame+frame);
+			string numstr_string(numstr);
+			framename /= lines_[lines_id_].first.first; 
+			framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";
+			CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+						new_height, new_width, &datum));
+			this->data_transformer_.Transform2(frame*batch_size + item_id, datum, this->mean_, top_data, t_param);
+		}
 
 		if (consilience_data_param.input_type() == caffe::ConsilienceDataParameter_InputType_OPTFLOW) {
 			// read optical flow image, crop it, mirroring, resize it to 13,13(conv5)

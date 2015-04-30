@@ -11,7 +11,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 8
+    batch_size: 6
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -33,7 +33,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 8
+    batch_size: 6
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -135,8 +135,8 @@ layers { bottom: "flow_conv5" top: "flow_feat" name: "flow_pool5" type: POOLING
 layers { type: SLICE name: 'rgb_slice' bottom: 'rgb_pool5' 
 	top: "slice1" top: "slice2" top: "slice3" top: "slice4" top: "slice5" top: "slice6" 
 	top: "slice7" top: "slice8" top: "slice9" top: "slice10"
-	slice_param { slice_dim: 0 slice_point: 8 slice_point: 16 slice_point: 24
-	slice_point: 32 slice_point: 40 slice_point: 48 slice_point: 56 slice_point: 64 slice_point: 72 } }
+	slice_param { slice_dim: 0 slice_point: 6 slice_point: 12 slice_point: 18
+	slice_point: 24 slice_point: 30 slice_point: 36 slice_point: 42 slice_point: 48 slice_point: 54 } }
 
 #	slice_param { slice_dim: 0 slice_point: 24 slice_point: 48 slice_point: 72
 #	slice_point: 96 slice_point: 120 slice_point: 144 slice_point: 168 slice_point: 192 slice_point: 216 } }

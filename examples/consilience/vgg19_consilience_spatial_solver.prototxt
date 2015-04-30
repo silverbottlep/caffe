@@ -2,7 +2,7 @@ net: "examples/consilience/vgg19_consilience_spatial.prototxt"
 test_iter: 32
 test_interval: 500
 base_lr: 0.001
-iter_size: 15
+iter_size: 20
 lr_policy: "step"
 gamma: 0.1
 stepsize: 20000

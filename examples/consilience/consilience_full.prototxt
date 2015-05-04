@@ -11,7 +11,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 24
+    batch_size: 128
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -32,8 +32,7 @@ layers {
     source: "data/ucf101/test1.txt"
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
-		shuffle: true
-    batch_size: 24
+    batch_size: 50
 		input_type: CONSILIENCE
   }
   transform_param {
@@ -94,80 +93,77 @@ layers { bottom: "flow_conv4" top: "flow_conv4" name: "flow_relu4" type: RELU }
 layers { bottom: "flow_conv4" top: "flow_conv5" name: "flow_conv5" type: CONVOLUTION
   blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
 layers { bottom: "flow_conv5" top: "flow_conv5" name: "flow_relu5" type: RELU }
-layers { bottom: "flow_conv5" top: "flow_feat" name: "flow_pool5" type: POOLING
+layers { bottom: "flow_conv5" top: "flow_pool5" name: "flow_pool5" type: POOLING
   pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
 
-# consilience
 
-layers { type: SLICE name: 'rgb_slice' bottom: 'rgb_pool5' 
-	top: "slice1" top: "slice2" top: "slice3" top: "slice4" top: "slice5" top: "slice6" 
-	top: "slice7" top: "slice8" top: "slice9" top: "slice10"
-	slice_param { slice_dim: 0 slice_point: 24 slice_point: 48 slice_point: 72
-	slice_point: 96 slice_point: 120 slice_point: 144 slice_point: 168 slice_point: 192 slice_point: 216 } }
+	
+	layers { type: CONSILIENCE name: 'consilience' bottom: 'rgb_pool5' bottom: 'flow_pool5' top: 'consilience' }
 
-#	slice_param { slice_dim: 0 slice_point: 16 slice_point: 32 slice_point: 48
-#	slice_point: 64 slice_point: 80 slice_point: 96 slice_point: 112 slice_point: 128 slice_point: 144} }
+layers { type: SLICE name: 'consilience_slice' bottom: 'consilience' top: "slice1" top: "slice2" top: "slice3" top: "slice4" slice_param { slice_dim: 1 slice_point: 65536 slice_point: 131072 slice_point: 196608 }}
 
-# slice_param { slice_dim: 0 slice_point: 50 slice_point: 100 slice_point: 150
-# slice_point: 200 slice_point: 250 slice_point: 300 slice_point: 350 slice_point: 400 slice_point: 450 } }
+layers { bottom: "slice1" top: "slice1" name: "fc_slice1" type: INNER_PRODUCT
+  blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 1024 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "slice2" top: "slice2" name: "fc_slice2" type: INNER_PRODUCT
+  blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 1024 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "slice3" top: "slice3" name: "fc_slice3" type: INNER_PRODUCT
+  blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 1024 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "slice4" top: "slice4" name: "fc_slice4" type: INNER_PRODUCT
+  blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 1024 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { type: CONCAT 
+	bottom: "slice1" bottom: "slice2" bottom: "slice3" bottom: "slice4" top: "concat" name: "concat" concat_param { concat_dim: 1} }
 
-#	slice_param { slice_dim: 0 slice_point: 32 slice_point: 64 slice_point: 96 
-#	slice_point: 128 slice_point: 160 slice_point: 192 slice_point: 224 slice_point: 256 slice_point: 288 } }
 
-layers { type: ELTWISE name: 'rgb_slice_max' 
-	bottom: 'slice1' bottom: 'slice2' bottom: 'slice3' bottom: 'slice4' bottom: 'slice5' 
-	bottom: 'slice6' bottom: 'slice7' bottom: 'slice8' bottom: 'slice9' bottom: 'slice10'
-	top: 'rgb_feat' eltwise_param { operation: MAX} }
-
-layers { bottom: "rgb_feat" top: "rgb_feat" name: "rgb_norm" type: NORMALIZE } 
-layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
- blobs_lr: 1 convolution_param { num_output: 512 kernel_size: 1 stride: 1 bias_term: false
- weight_filler { type: "xavier" } } }
-
- layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_feat' 
-	top: 'consilience' eltwise_param { operation: PROD } }
-
-layers {
-  bottom: "consilience"
-  top: "cons_fc6"
-  name: "cons_fc6"
-  type: INNER_PRODUCT
-  blobs_lr: 1
-  blobs_lr: 2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-layers {
-  bottom: "cons_fc6"
-  top: "cons_fc6"
-  name: "relu6"
-  type: RELU
-}
-layers {
-  bottom: "cons_fc6"
-  top: "cons_fc6"
-  name: "drop6"
-  type: DROPOUT
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
+#layers {
+#  bottom: "concat"
+#  top: "fc6"
+#  name: "fc6"
+#  type: INNER_PRODUCT
+#  blobs_lr: 1
+#  blobs_lr: 2
+#  weight_decay: 1
+#  weight_decay: 0
+#  inner_product_param {
+#    num_output: 4096
+#    weight_filler {
+#      type: "gaussian"
+#      std: 0.005
+#    }
+#    bias_filler {
+#      type: "constant"
+#      value: 0.1
+#    }
+#  }
+#}
+#layers {
+#  bottom: "fc6"
+#  top: "fc6"
+#  name: "relu6"
+#  type: RELU
+#}
+#layers {
+#  bottom: "fc6"
+#  top: "fc6"
+#  name: "drop6"
+#  type: DROPOUT
+#  dropout_param {
+#    dropout_ratio: 0.5
+#  }
+#}
 
 layers {
-	bottom: "cons_fc6"
-  top: "cons_fc7"
-  name: "cons_fc7"
+#bottom: "fc6"
+	bottom: "concat"
+  top: "fc7"
+  name: "fc7"
   blobs_lr: 1
   blobs_lr: 2
   weight_decay: 1
@@ -186,14 +182,14 @@ layers {
   }
 }
 layers {
-  bottom: "cons_fc7"
-  top: "cons_fc7"
+  bottom: "fc7"
+  top: "fc7"
   name: "relu7"
   type: RELU
 }
 layers {
-  bottom: "cons_fc7"
-  top: "cons_fc7"
+  bottom: "fc7"
+  top: "fc7"
   name: "drop7"
   type: DROPOUT
   dropout_param {
@@ -201,9 +197,9 @@ layers {
   }
 }
 layers {
-  bottom: "cons_fc7"
-  top: "cons_fc8"
-  name: "cons_fc8"
+  bottom: "fc7"
+  top: "fc8_ucf101"
+  name: "fc8_ucf101"
   blobs_lr: 1
   blobs_lr: 2
   weight_decay: 1
@@ -224,7 +220,7 @@ layers {
 layers {
   name: "accuracy"
   type: ACCURACY
-  bottom: "cons_fc8"
+  bottom: "fc8_ucf101"
   bottom: "label"
   top: "accuracy"
   include: { phase: TEST }
@@ -232,7 +228,7 @@ layers {
 layers {
   name: "loss"
   type: SOFTMAX_LOSS
-  bottom: "cons_fc8"
+  bottom: "fc8_ucf101"
   bottom: "label"
   top: "loss"
 }

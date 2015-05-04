@@ -70,19 +70,20 @@ template <typename Dtype>
 void NormalizeLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, vector<Blob<Dtype>*>* bottom) {
   const Dtype* top_diff = top[0]->gpu_diff();
-  const Dtype* top_data = top[0]->gpu_data();
-  const Dtype* bottom_data = (*bottom)[0]->gpu_data();
+  //const Dtype* top_data = top[0]->gpu_data();
+  //const Dtype* bottom_data = (*bottom)[0]->gpu_data();
   Dtype* bottom_diff = (*bottom)[0]->mutable_gpu_diff();
-  int n = top[0]->num();
-  int d = top[0]->count() / n;
-  Dtype a;
-  for (int i=0; i<n; ++i) {
-    caffe_gpu_dot(d, top_data+i*d, top_diff+i*d, &a);
-    caffe_gpu_scale(d, a, top_data+i*d, bottom_diff+i*d);
-    caffe_gpu_sub(d, top_diff+i*d, bottom_diff+i*d, bottom_diff+i*d);
-    caffe_gpu_dot(d, bottom_data+i*d, bottom_data+i*d, &a);
-    caffe_gpu_scale(d, Dtype(pow(a, -0.5)), bottom_diff+i*d, bottom_diff+i*d);
-  }
+  //int n = top[0]->num();
+  //int d = top[0]->count() / n;
+  //Dtype a;
+  //for (int i=0; i<n; ++i) {
+    //caffe_gpu_dot(d, top_data+i*d, top_diff+i*d, &a);
+    //caffe_gpu_scale(d, Dtype(1.0), top_data+i*d, bottom_diff+i*d);
+    //caffe_gpu_sub(d, top_diff+i*d, bottom_diff+i*d, bottom_diff+i*d);
+    //caffe_gpu_dot(d, bottom_data+i*d, bottom_data+i*d, &a);
+    //caffe_gpu_scale(d, Dtype(pow(a, -0.5)), bottom_diff+i*d, bottom_diff+i*d);
+  //}
+  caffe_copy(top[0]->count(), top_diff, bottom_diff);
 }
 
 INSTANTIATE_CLASS(NormalizeLayer);

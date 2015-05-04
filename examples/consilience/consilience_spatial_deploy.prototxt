@@ -1,49 +1,16 @@
 name: "CONSILIENCENET"
 
-layers {
-  name: "data"
-  type: CONSILIENCE_DATA
-  top: "rgbdata"
-  top: "label"
-  top: "flowdata"
-  consilience_data_param {
-    source: "data/ucf101/train1.txt"
-    image_dir: "data/ucf101/ucf101_image/"
-    flow_dir: "data/ucf101/ucf101_opt/"
-		shuffle: true
-    batch_size: 24
-		input_type: CONSILIENCE
-  }
-  transform_param {
-    crop_size: 224
-		mean_file: "data/ucf101/ucf101_rgb_mean.binaryproto"
-		flow_mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
-    mirror: true
-  }
-  include: { phase: TRAIN }
-}
-layers {
-  name: "data"
-  type: CONSILIENCE_DATA
-  top: "rgbdata"
-  top: "label"
-  top: "flowdata"
-  consilience_data_param {
-    source: "data/ucf101/test1.txt"
-    image_dir: "data/ucf101/ucf101_image/"
-    flow_dir: "data/ucf101/ucf101_opt/"
-		shuffle: true
-    batch_size: 24
-		input_type: CONSILIENCE
-  }
-  transform_param {
-    crop_size: 224
-		mean_file: "data/ucf101/ucf101_rgb_mean.binaryproto"
-		flow_mean_file: "data/ucf101/ucf101_flow_mean.binaryproto"
-    mirror: false
-  }
-  include: { phase: TEST }
-}
+input: "rgbdata"
+input_dim: 100
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+input: "flowdata"
+input_dim: 10
+input_dim: 20
+input_dim: 224
+input_dim: 224
 
 # spatialnet
 layers { bottom: "rgbdata" top: "rgb_conv1" name: "rgb_conv1" type: CONVOLUTION
@@ -102,8 +69,8 @@ layers { bottom: "flow_conv5" top: "flow_feat" name: "flow_pool5" type: POOLING
 layers { type: SLICE name: 'rgb_slice' bottom: 'rgb_pool5' 
 	top: "slice1" top: "slice2" top: "slice3" top: "slice4" top: "slice5" top: "slice6" 
 	top: "slice7" top: "slice8" top: "slice9" top: "slice10"
-	slice_param { slice_dim: 0 slice_point: 24 slice_point: 48 slice_point: 72
-	slice_point: 96 slice_point: 120 slice_point: 144 slice_point: 168 slice_point: 192 slice_point: 216 } }
+	slice_param { slice_dim: 0 slice_point: 10 slice_point: 20 slice_point:30 
+	slice_point: 40 slice_point: 50 slice_point: 60 slice_point: 70 slice_point: 80 slice_point: 90 } }
 
 #	slice_param { slice_dim: 0 slice_point: 16 slice_point: 32 slice_point: 48
 #	slice_point: 64 slice_point: 80 slice_point: 96 slice_point: 112 slice_point: 128 slice_point: 144} }
@@ -119,120 +86,24 @@ layers { type: ELTWISE name: 'rgb_slice_max'
 	bottom: 'slice6' bottom: 'slice7' bottom: 'slice8' bottom: 'slice9' bottom: 'slice10'
 	top: 'rgb_feat' eltwise_param { operation: MAX} }
 
-layers { bottom: "rgb_feat" top: "rgb_feat" name: "rgb_norm" type: NORMALIZE } 
-layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
+layers { bottom: "flow_feat" top: "flow_feat" name: "flow_norm" type: NORMALIZE } 
+layers { bottom: "flow_feat" top: "flow_comb" name: "flow_comb" type: CONVOLUTION
  blobs_lr: 1 convolution_param { num_output: 512 kernel_size: 1 stride: 1 bias_term: false
  weight_filler { type: "xavier" } } }
 
- layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_feat' 
+layers { type: ELTWISE name: 'consilience' bottom: 'rgb_feat' bottom: 'flow_comb' 
 	top: 'consilience' eltwise_param { operation: PROD } }
 
-layers {
-  bottom: "consilience"
-  top: "cons_fc6"
-  name: "cons_fc6"
-  type: INNER_PRODUCT
-  blobs_lr: 1
-  blobs_lr: 2
-  weight_decay: 1
-  weight_decay: 0
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-layers {
-  bottom: "cons_fc6"
-  top: "cons_fc6"
-  name: "relu6"
-  type: RELU
-}
-layers {
-  bottom: "cons_fc6"
-  top: "cons_fc6"
-  name: "drop6"
-  type: DROPOUT
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
-layers {
-	bottom: "cons_fc6"
-  top: "cons_fc7"
-  name: "cons_fc7"
-  blobs_lr: 1
-  blobs_lr: 2
-  weight_decay: 1
-  weight_decay: 0
-  type: INNER_PRODUCT
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-layers {
-  bottom: "cons_fc7"
-  top: "cons_fc7"
-  name: "relu7"
-  type: RELU
-}
-layers {
-  bottom: "cons_fc7"
-  top: "cons_fc7"
-  name: "drop7"
-  type: DROPOUT
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layers {
-  bottom: "cons_fc7"
-  top: "cons_fc8"
-  name: "cons_fc8"
-  blobs_lr: 1
-  blobs_lr: 2
-  weight_decay: 1
-  weight_decay: 0
-  type: INNER_PRODUCT
-  inner_product_param {
-    num_output: 101
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-layers {
-  name: "accuracy"
-  type: ACCURACY
-  bottom: "cons_fc8"
-  bottom: "label"
-  top: "accuracy"
-  include: { phase: TEST }
-}
-layers {
-  name: "loss"
-  type: SOFTMAX_LOSS
-  bottom: "cons_fc8"
-  bottom: "label"
-  top: "loss"
-}
+layers { bottom: "consilience" top: "cons_fc6" name: "cons_fc6" type: INNER_PRODUCT
+  inner_product_param { num_output: 4096 } }
+layers { bottom: "cons_fc6" top: "cons_fc6" name: "relu6" type: RELU }
+layers { bottom: "cons_fc6" top: "cons_fc6" name: "drop6" type: DROPOUT
+  dropout_param { dropout_ratio: 0.5 } }
+layers { bottom: "cons_fc6" top: "cons_fc7" name: "cons_fc7" type: INNER_PRODUCT
+  inner_product_param { num_output: 4096 } }
+layers { bottom: "cons_fc7" top: "cons_fc7" name: "relu7" type: RELU }
+layers { bottom: "cons_fc7" top: "cons_fc7" name: "drop7" type: DROPOUT
+  dropout_param { dropout_ratio: 0.5 } }
+layers { bottom: "cons_fc7" top: "cons_fc8" name: "cons_fc8" type: INNER_PRODUCT
+  inner_product_param { num_output: 101 } }
+layers { name: "prob" type: SOFTMAX bottom: "cons_fc8" top: "prob" }

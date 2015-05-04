@@ -119,13 +119,8 @@ layers { type: ELTWISE name: 'rgb_slice_max'
 	bottom: 'slice6' bottom: 'slice7' bottom: 'slice8' bottom: 'slice9' bottom: 'slice10'
 	top: 'rgb_feat' eltwise_param { operation: MAX} }
 
-layers { bottom: "rgb_feat" top: "rgb_feat" name: "rgb_norm" type: NORMALIZE } 
-layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
- blobs_lr: 1 convolution_param { num_output: 512 kernel_size: 1 stride: 1 bias_term: false
- weight_filler { type: "xavier" } } }
-
- layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_feat' 
-	top: 'consilience' eltwise_param { operation: PROD } }
+layers { type: CONCAT name: 'consilience' bottom: 'rgb_feat' bottom: 'flow_feat' 
+	top: 'consilience' concat_param { concat_dim: 1} }
 
 layers {
   bottom: "consilience"

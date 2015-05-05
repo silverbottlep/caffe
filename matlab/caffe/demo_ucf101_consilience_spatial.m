@@ -4,8 +4,10 @@ list_file = '../../data/ucf101/test1.txt';
 %list_file = '../../data/ucf101/test2.txt';
 %list_file = '../../data/ucf101/test3.txt';
 
-model_def_file = '../../examples/consilience/consilience_spatial_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/consilience_spatial_iter_40000.caffemodel';
+%model_def_file = '../../examples/consilience/consilience_spatial_deploy.prototxt';
+%model_file = '../../examples/consilience/snapshot/consilience_spatial_iter_40000.caffemodel';
+model_def_file = '../../examples/consilience/consilience_spatial_nonorm_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/consilience_spatial_nonorm_ft_iter_40000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
 
@@ -32,8 +34,8 @@ CROPPED_DIM = 224;
 nsamples = 25;
 nchannels = 10;
 ncrops = 10;
-rgb_input = zeros(CROPPED_DIM, CROPPED_DIM, 3, nchannels*10, 'single');
-flow_input = zeros(CROPPED_DIM, CROPPED_DIM, nchannels*2, 10, 'single');
+rgb_input = zeros(CROPPED_DIM, CROPPED_DIM, 3, ncrops, 'single');
+flow_input = zeros(CROPPED_DIM, CROPPED_DIM, nchannels*2, ncrops, 'single');
 scores = zeros(101,nsamples*ncrops);
 
 for i=1:num_item
@@ -55,17 +57,16 @@ for i=1:num_item
 			flow(:,:,(k-1)*2+1) = flow_x;
 			flow(:,:,(k-1)*2+2) = flow_y;
 
-			rgb_filename = strcat(rgb_dir, item, '/', item, '_f', ...
-			num2str(frame_num,'%04u'), '.jpg');
-			im = imread(char(rgb_filename));
-			im = single(im);
-			if size(im,3) == 1
-					im = cat(3,im,im,im);
-			end
-			im = im(:,:,[3 2 1]) - IMAGE_MEAN;
-			cropped_rgb = prepare_image_ucf101(im);
-			for crop=1:ncrops
-				rgb_input(:,:,:,(crop-1)*ncrops+k) = cropped_rgb(:,:,:,crop);
+			if k==1
+				rgb_filename = strcat(rgb_dir, item, '/', item, '_f', ...
+				num2str(frame_num,'%04u'), '.jpg');
+				im = imread(char(rgb_filename));
+				im = single(im);
+				if size(im,3) == 1
+						im = cat(3,im,im,im);
+				end
+				im = im(:,:,[3 2 1]) - IMAGE_MEAN;
+				rgb_input = prepare_image_ucf101(im);
 			end
 		end
 		flow_input = prepare_image_ucf101(flow);

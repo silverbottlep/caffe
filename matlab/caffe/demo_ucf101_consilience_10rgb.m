@@ -4,8 +4,9 @@ list_file = '../../data/ucf101/test1.txt';
 %list_file = '../../data/ucf101/test2.txt';
 %list_file = '../../data/ucf101/test3.txt';
 
-model_def_file = '../../examples/consilience/consilience_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/consilience_lr00005_iter_40000.caffemodel';
+%model_def_file = '../../examples/consilience/consilience_deploy.prototxt';
+model_def_file = '../../examples/consilience/consilience_nonorm_rgb10_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/consilience_nonorm_iter_40000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
 

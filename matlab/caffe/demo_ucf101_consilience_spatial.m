@@ -84,16 +84,16 @@ for i=1:num_item
 		accuracy = accuracy+1;
 	end
 
-	consilience_result(i).feat = scores;
-	consilience_result(i).item_name = item;
-	consilience_result(i).nframes = nframes(i);
-	consilience_result(i).label = item_label(i);
-	coneilience_result(i).output_label = output_label(i);
+	consilience_spatial_result(i).feat = scores;
+	consilience_spatial_result(i).item_name = item;
+	consilience_spatial_result(i).nframes = nframes(i);
+	consilience_spatial_result(i).label = item_label(i);
+	consilience_spatial_result(i).output_label = output_label(i);
 
 	fprintf('processing %s(%d/%d) accuracy: %.2f%% output:(%d/%f) gt:%d \n', ...
 			item, i, num_item, (accuracy/i)*100, output_label(i), max_s, item_label(i));
 	toc;
 end
 
-save('consilience_spatial_result.mat', 'consilience_result');
+save('consilience_spatial_result.mat', 'consilience_spatial_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

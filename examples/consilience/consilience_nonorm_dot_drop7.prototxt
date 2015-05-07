@@ -118,7 +118,6 @@ layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb
 	top: 'consilience' eltwise_param { operation: PROD } }
 layers { bottom: "consilience" top: "consilience" name: "consilience_pool" type: POOLING
   pooling_param { pool: AVE kernel_size: 6 stride: 1 } }
-layers { bottom: "consilience" top: "consilience" name: "consilience_norm" type: NORMALIZE } 
 
 layers {
   bottom: "consilience"
@@ -153,7 +152,7 @@ layers {
   name: "drop6"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 
@@ -190,7 +189,7 @@ layers {
   name: "drop7"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layers {

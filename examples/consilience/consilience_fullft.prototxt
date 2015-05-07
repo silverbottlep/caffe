@@ -33,8 +33,8 @@ layers {
     source: "data/ucf101/test1.txt"
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
-		shuffle: true
     batch_size: 50
+		shuffle: true
 		input_type: CONSILIENCE
   }
   transform_param {

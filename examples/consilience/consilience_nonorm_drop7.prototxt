@@ -107,18 +107,14 @@ convolution_param { num_output: 512 kernel_size: 1 stride: 1
  weight_filler { type: "xavier" } bias_filler { type: "xavier" } } }
 layers { bottom: "rgb_comb" top: "rgb_comb" name: "rgb_comb_relu" type: RELU }
 
-
 layers { bottom: "flow_feat" top: "flow_comb" name: "flow_comb" type: CONVOLUTION
  blobs_lr: 1 blobs_lr: 1  weight_decay: 1 weight_decay: 0
 convolution_param { num_output: 512 kernel_size: 1 stride: 1 
  weight_filler { type: "xavier" } bias_filler { type: "xavier" } } }
 layers { bottom: "flow_comb" top: "flow_comb" name: "flow_comb_relu" type: RELU }
 
-layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb' 
+ layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb' 
 	top: 'consilience' eltwise_param { operation: PROD } }
-layers { bottom: "consilience" top: "consilience" name: "consilience_pool" type: POOLING
-  pooling_param { pool: AVE kernel_size: 6 stride: 1 } }
-layers { bottom: "consilience" top: "consilience" name: "consilience_norm" type: NORMALIZE } 
 
 layers {
   bottom: "consilience"
@@ -153,7 +149,7 @@ layers {
   name: "drop6"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 
@@ -190,7 +186,7 @@ layers {
   name: "drop7"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layers {

@@ -1,8 +1,8 @@
 net: "examples/consilience/consilience_sqrtnorm_dot.prototxt"
 test_iter: 80
 test_interval: 1000
-base_lr: 0.001
-iter_size: 1
+base_lr: 0.01
+iter_size: 2
 lr_policy: "step"
 gamma: 0.1
 stepsize: 20000

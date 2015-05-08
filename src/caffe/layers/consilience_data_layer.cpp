@@ -203,7 +203,7 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		
 		path framename(image_dir);
 		char numstr[7]={0};
-		sprintf(numstr,"_f%04d",start_frame);
+		sprintf(numstr,"_f%04d",start_frame+(num_channels/2)-1);
 		string numstr_string(numstr);
 		framename /= lines_[lines_id_].first.first; 
 		framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";

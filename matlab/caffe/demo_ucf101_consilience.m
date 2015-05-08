@@ -7,8 +7,11 @@ list_file = '../../data/ucf101/test1.txt';
 %model_def_file = '../../examples/consilience/consilience_deploy.prototxt';
 %model_def_file = '../../examples/consilience/consilience_nonorm_deploy.prototxt';
 %model_file = '../../examples/consilience/snapshot/consilience_nonorm_iter_40000.caffemodel';
-model_def_file = '../../examples/consilience/vgg19_consilience_nonorm_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/vgg19_consilience_nonorm_iter_40000.caffemodel';
+%model_def_file = '../../examples/consilience/vgg19_consilience_nonorm_deploy.prototxt';
+%model_file = '../../examples/consilience/snapshot/vgg19_consilience_nonorm_iter_40000.caffemodel';
+model_def_file = '../../examples/consilience/consilience_nonorm_d2048_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/consilience_nonorm_d2048_drop7_iter_40000.caffemodel';
+
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
 
@@ -73,7 +76,7 @@ for i=1:num_item
 		flow_input = prepare_image_ucf101(flow);
 
 		output_data = caffe('forward', {single(rgb_input); single(flow_input)} );
-		scores(:,(j-1)*nsamples+1:(j-1)*nsamples+ncrops) = squeeze(output_data{1});
+		scores(:,(j-1)*ncrops+1:(j-1)*ncrops+ncrops) = squeeze(output_data{1});
 	end
 
 	s = sum(scores,2)/size(scores,2);
@@ -96,6 +99,6 @@ for i=1:num_item
 	toc;
 end
 
-save('vgg19_consilience_result.mat', 'consilience_result');
-%save('consilience_result.mat', 'consilience_result');
+%save('vgg19_consilience_result.mat', 'consilience_result');
+save('consilience_result_drop7.mat', 'consilience_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

@@ -10,6 +10,6 @@ display: 100
 max_iter: 60000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 20000
+snapshot: 10000
 snapshot_prefix: "examples/cons/snapshot/cons_d4096_drop7"
 solver_mode: GPU

@@ -6,11 +6,12 @@ from google import protobuf
 model_root = '/home/eunbyung/Works/src/caffe/examples/cons/' 
 #spatialnet_proto_file = model_root + 'spatialnet_ft.prototxt'
 #temporalnet_proto_file = model_root + 'temporalnet_ft.prototxt'
-spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
+spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_vgg19_ft_iter_60000.caffemodel'
 temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
+consiliencenet_param_file = model_root + 'snapshot/' + 'vgg19_consilience_nonorm_d1024_drop7_bias_iter_40000.caffemodel'
 
-fusion_proto_file = model_root + 'fusion_twostream.prototxt'
-fusion_param_file = model_root + 'snapshot/' + 'fusion_twostream.caffemodel'
+fusion_proto_file = model_root + 'vgg19_fusion_triple.prototxt'
+fusion_param_file = model_root + 'snapshot/' + 'vgg19_fusion_triple.caffemodel'
 
 # loading spatialnet, and build blob lookup dic
 spatialnet = NetParameter()
@@ -42,6 +43,20 @@ for layer in temporalnet.layers:
         temporalnet_blob_lookup[new_name] = layer.blobs
         print "-", new_name
 
+# loading consiliencenet, and build blob lookup dic
+consiliencenet = NetParameter()
+cf = open(consiliencenet_param_file,'rb')
+consiliencenet.ParseFromString(cf.read())
+cf.close()
+print "blobs loaded from", consiliencenet.name
+
+consiliencenet_blob_lookup = dict()
+for layer in consiliencenet.layers:
+    if len(layer.blobs) > 0:
+        assert layer.name not in consiliencenet_blob_lookup
+        consiliencenet_blob_lookup[layer.name] = layer.blobs
+        print "-", layer.name
+
 # loading fusion net proto description files
 fusion = NetParameter()
 f = open(fusion_proto_file,'r')
@@ -67,6 +82,12 @@ for layer in fusion.layers:
         print "-", layer.name
     elif 'flow_fc' in layer.name:
         layer.blobs.extend(temporalnet_blob_lookup[layer.name])
+        print "-", layer.name
+    elif 'cons_fc' in layer.name:
+        layer.blobs.extend(consiliencenet_blob_lookup[layer.name])
+        print "-", layer.name
+    elif '_comb' in layer.name:
+        layer.blobs.extend(consiliencenet_blob_lookup[layer.name])
         print "-", layer.name
 
 out_file = open(fusion_param_file, 'wb')

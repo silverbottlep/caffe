@@ -45,7 +45,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 64
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -64,7 +64,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 64
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -94,7 +94,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 128
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -113,7 +113,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 128
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -143,7 +143,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -162,7 +162,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -181,7 +181,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -200,7 +200,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 1
+    pad: 0
     kernel_size: 3
   }
 }
@@ -397,8 +397,8 @@ layers {
 }
 layers {
   bottom: "pool5"
-  top: "fc6"
-  name: "fc6"
+  top: "fc6_ucf101"
+  name: "fc6_ucf101"
   blobs_lr: 1
   blobs_lr: 2
   weight_decay: 1
@@ -417,14 +417,14 @@ layers {
   }
 }
 layers {
-  bottom: "fc6"
-  top: "fc6"
+  bottom: "fc6_ucf101"
+  top: "fc6_ucf101"
   name: "relu6"
   type: RELU
 }
 layers {
-  bottom: "fc6"
-  top: "fc6"
+  bottom: "fc6_ucf101"
+  top: "fc6_ucf101"
   name: "drop6"
   type: DROPOUT
   dropout_param {
@@ -432,9 +432,9 @@ layers {
   }
 }
 layers {
-  bottom: "fc6"
-  top: "fc7"
-  name: "fc7"
+  bottom: "fc6_ucf101"
+  top: "fc7_ucf101"
+  name: "fc7_ucf101"
   type: INNER_PRODUCT
   blobs_lr: 1
   blobs_lr: 2
@@ -453,14 +453,14 @@ layers {
   }
 }
 layers {
-  bottom: "fc7"
-  top: "fc7"
+  bottom: "fc7_ucf101"
+  top: "fc7_ucf101"
   name: "relu7"
   type: RELU
 }
 layers {
-  bottom: "fc7"
-  top: "fc7"
+  bottom: "fc7_ucf101"
+  top: "fc7_ucf101"
   name: "drop7"
   type: DROPOUT
   dropout_param {
@@ -468,7 +468,7 @@ layers {
   }
 }
 layers {
-  bottom: "fc7"
+	bottom: "fc7_ucf101"
   top: "fc8_ucf101"
   name: "fc8_ucf101"
   blobs_lr: 1

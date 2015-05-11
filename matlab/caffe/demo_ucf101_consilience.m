@@ -61,9 +61,9 @@ for i=1:num_item
 			flow(:,:,(k-1)*2+1) = flow_x;
 			flow(:,:,(k-1)*2+2) = flow_y;
 
-			if k==1
+			if k==(nchannels/2)
 				rgb_filename = strcat(rgb_dir, item, '/', item, '_f', ...
-				num2str(frame_num,'%04u'), '.jpg');
+				num2str(frame_num+k,'%04u'), '.jpg');
 				im = imread(char(rgb_filename));
 				im = single(im);
 				if size(im,3) == 1

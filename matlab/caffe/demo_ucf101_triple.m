@@ -1,10 +1,10 @@
-load('flow_result.mat');
-load('rgb_vgg19_result.mat');
-load('rgb_vgg19_consilience_result.mat');
-load('vgg19_consilience_result.mat');
+%load('flow_result.mat');
+%load('rgb_vgg19_result.mat');
+%load('rgb_vgg19_consilience_result.mat');
+%load('vgg19_consilience_result.mat');
 %load('rgb_result.mat');
 %load('rgb_consilience_result.mat');
-%load('consilience_result_.mat');
+%load('consilience_result.mat');
 
 accuracy = 0;
 rgb_accuracy = 0;
@@ -36,8 +36,8 @@ for i=1:total_item
 	fprintf('flow: %d, %.2f, (accuracy:%.2f)\n', flow_output_label, flow_max_s, 100*flow_accuracy/i);
 
 	consilience_feat = consilience_result(i).feat;
-	%consilience_feat = sum(consilience_feat,2)/size(consilience_feat,2);
 	consilience_feat = sum(consilience_feat,2)/250;
+	%consilience_feat = sum(consilience_feat,2)/size(consilience_feat,2);
 	[consilience_max_s, idx] = max(consilience_feat);
 	consilience_output_label = idx-1;
 	if label == consilience_output_label

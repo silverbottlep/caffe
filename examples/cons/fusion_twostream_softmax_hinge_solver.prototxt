@@ -8,9 +8,9 @@ lr_policy: "step"
 gamma: 0.1
 stepsize: 20000
 display: 100
-max_iter: 60000
+max_iter: 40000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 20000
+snapshot: 40000
 snapshot_prefix: "examples/cons/snapshot/fusion_twostream_softmax_hinge"
 solver_mode: GPU

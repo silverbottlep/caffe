@@ -6,10 +6,13 @@ list_file = '../../data/ucf101/test1.txt';
 
 %model_def_file = '../../examples/consilience/consilience_temporal_deploy.prototxt';
 %model_file = '../../examples/consilience/snapshot/consilience_temporal_iter_40000.caffemodel';
-model_def_file = '../../examples/consilience/consilience_temporal_nonorm_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/consilience_temporal_nonorm_ft_iter_40000.caffemodel';
+%model_def_file = '../../examples/consilience/consilience_temporal_nonorm_deploy.prototxt';
+%model_file = '../../examples/consilience/snapshot/consilience_temporal_nonorm_ft_iter_40000.caffemodel';
+model_def_file = '../../examples/consilience/vgg19_consilience_temporal_nonorm_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/vgg19_consilience_temporal_nonorm_ft_iter_40000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
+caffe('set_device',0);
 
 flow_mean = imread('../../data/ucf101/ucf101_flow_mean.binaryproto.jpg');
 FLOW_MEAN = single(flow_mean);
@@ -36,7 +39,7 @@ nchannels = 10;
 ncrops = 10;
 rgb_input = zeros(CROPPED_DIM, CROPPED_DIM, 3, ncrops, 'single');
 flow_input = zeros(CROPPED_DIM, CROPPED_DIM, nchannels*2, ncrops, 'single');
-scores = zeros(101,nsamples*ncrops);
+scores = single(zeros(101,nsamples*ncrops));
 
 for i=1:num_item
 	item = char(item_name{i});
@@ -72,7 +75,7 @@ for i=1:num_item
 		flow_input = prepare_image_ucf101(flow);
 
 		output_data = caffe('forward', {single(rgb_input); single(flow_input)} );
-		scores(:,(j-1)*nsamples+1:(j-1)*nsamples+ncrops) = squeeze(output_data{1});
+		scores(:,(j-1)*ncrops+1:(j-1)*ncrops+ncrops) = squeeze(output_data{1});
 	end
 
 	s = sum(scores,2)/size(scores,2);
@@ -95,5 +98,6 @@ for i=1:num_item
 	toc;
 end
 
-save('consilience_temporal_result.mat', 'consilience_temporal_result');
+%save('consilience_temporal_result.mat', 'consilience_temporal_result');
+save('vgg19_consilience_temporal_result.mat', 'consilience_temporal_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

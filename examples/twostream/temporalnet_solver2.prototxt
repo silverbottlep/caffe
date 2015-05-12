@@ -2,11 +2,12 @@ net: "examples/twostream/temporalnet.prototxt"
 test_iter: 80
 test_interval: 1000
 base_lr: 0.001
+iter_size: 2
 lr_policy: "fixed"
 display: 100
-max_iter: 120000
+max_iter: 80000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 120000
+snapshot: 80000
 snapshot_prefix: "examples/twostream/snapshot/temporalnet"
 solver_mode: GPU

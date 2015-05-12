@@ -15,7 +15,7 @@ type: VIDEO_DATA
     source: "data/ucf101/train1.txt"
     root_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 128
+    batch_size: 64
 		num_channels: 10
 		input_type: FLOW
   }

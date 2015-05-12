@@ -7,10 +7,10 @@ list_file = '../../data/ucf101/test1.txt';
 %model_def_file = '../../examples/consilience/consilience_deploy.prototxt';
 %model_def_file = '../../examples/consilience/consilience_nonorm_deploy.prototxt';
 %model_file = '../../examples/consilience/snapshot/consilience_nonorm_iter_40000.caffemodel';
-%model_def_file = '../../examples/consilience/vgg19_consilience_nonorm_deploy.prototxt';
-%model_file = '../../examples/consilience/snapshot/vgg19_consilience_nonorm_iter_40000.caffemodel';
-model_def_file = '../../examples/consilience/consilience_nonorm_d2048_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/consilience_nonorm_d2048_drop7_iter_60000.caffemodel';
+model_def_file = '../../examples/consilience/vgg19_consilience_nonorm_d1024_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/vgg19_consilience_nonorm_d1024_drop7_bias_iter_60000.caffemodel';
+%model_def_file = '../../examples/consilience/consilience_nonorm_d2048_deploy.prototxt';
+%model_file = '../../examples/consilience/snapshot/consilience_nonorm_d2048_drop7_iter_60000.caffemodel';
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
@@ -99,6 +99,6 @@ for i=1:num_item
 	toc;
 end
 
-%save('vgg19_consilience_result.mat', 'consilience_result');
-save('consilience_result_drop7_.mat', 'consilience_result');
+save('vgg19_consilience_result.mat', 'consilience_result');
+%save('consilience_result_drop7_.mat', 'consilience_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

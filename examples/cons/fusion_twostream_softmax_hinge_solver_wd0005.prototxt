@@ -1,0 +1,16 @@
+net: "examples/cons/fusion_twostream_softmax_hinge.prototxt"
+test_iter: 80
+test_interval: 1000
+base_lr: 0.001
+iter_size: 2
+average_loss: 100
+lr_policy: "step"
+gamma: 0.1
+stepsize: 20000
+display: 100
+max_iter: 40000
+momentum: 0.9
+weight_decay: 0.005
+snapshot: 40000
+snapshot_prefix: "examples/cons/snapshot/fusion_twostream_softmax_hinge_wd0005"
+solver_mode: GPU

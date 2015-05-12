@@ -5,7 +5,7 @@ layers {
   top: "data"
   top: "label"
   video_data_param {
-    source: "data/ucf101/train1.txt"
+    source: "data/ucf101/train3.txt"
     root_dir: "data/ucf101/ucf101_image/"
 		shuffle: true
     batch_size: 64
@@ -24,7 +24,7 @@ layers {
   top: "data"
   top: "label"
   video_data_param {
-    source: "data/ucf101/test1.txt"
+    source: "data/ucf101/test3.txt"
     root_dir: "data/ucf101/ucf101_image/"
     batch_size: 50
 		input_type: IMAGE

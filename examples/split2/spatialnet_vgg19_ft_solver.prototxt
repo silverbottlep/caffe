@@ -1,4 +1,4 @@
-net: "examples/twostream/spatialnet_vgg19_ft.prototxt"
+net: "examples/split2/spatialnet_vgg19_ft.prototxt"
 test_iter: 80
 test_interval: 1000
 base_lr: 0.001
@@ -10,6 +10,6 @@ display: 100
 max_iter: 60000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 10000
-snapshot_prefix: "examples/twostream/snapshot/spatialnet_vgg19_ft"
+snapshot: 20000
+snapshot_prefix: "examples/split2/snapshot/spatialnet_vgg19_ft"
 solver_mode: GPU

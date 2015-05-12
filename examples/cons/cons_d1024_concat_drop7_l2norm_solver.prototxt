@@ -1,8 +1,9 @@
-net: "examples/twostream/spatialnet_vgg19_ft.prototxt"
+net: "examples/cons/cons_d1024_concat_drop7_l2norm.prototxt"
 test_iter: 80
 test_interval: 1000
 base_lr: 0.001
 iter_size: 2
+average_loss: 100
 lr_policy: "step"
 gamma: 0.1
 stepsize: 20000
@@ -10,6 +11,6 @@ display: 100
 max_iter: 60000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 10000
-snapshot_prefix: "examples/twostream/snapshot/spatialnet_vgg19_ft"
+snapshot: 20000
+snapshot_prefix: "examples/cons/snapshot/cons_d1024_concat_drop7_l2norm"
 solver_mode: GPU

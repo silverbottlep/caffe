@@ -72,7 +72,7 @@ for i=1:num_item
 		flow_input = prepare_image_ucf101(flow);
 
 		output_data = caffe('forward', {single(rgb_input); single(flow_input)} );
-		scores(:,(j-1)*nsamples+1:(j-1)*nsamples+ncrops) = squeeze(output_data{1});
+		scores(:,(j-1)*ncrops+1:(j-1)*ncrops+ncrops) = squeeze(output_data{1});
 	end
 
 	s = sum(scores,2)/size(scores,2);

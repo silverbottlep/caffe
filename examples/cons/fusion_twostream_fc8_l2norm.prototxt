@@ -139,61 +139,17 @@ layers { bottom: "flow_fc7" top: "flow_fc8" name: "flow_fc8"
   inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
     bias_filler { type: "constant" value: 0.1 } } }
 
-# consilience
-layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0  weight_decay: 1 weight_decay: 0
-convolution_param { num_output: 2048 kernel_size: 1 stride: 1 
- weight_filler { type: "xavier" } bias_filler { type: "constant" value: 1.0 } } }
-layers { bottom: "rgb_comb" top: "rgb_comb" name: "relu" type: RELU }
+# L2 normalization
+layers { bottom: "rgb_fc8" top: "rgb_fc8" name: "rgb_norm" type: NORMALIZE }
+layers { bottom: "flow_fc8" top: "flow_fc8" name: "flow_norm" type: NORMALIZE }
 
-layers { bottom: "flow_feat" top: "flow_comb" name: "flow_comb" type: CONVOLUTION
- blobs_lr: 0 blobs_lr: 0  weight_decay: 1 weight_decay: 0
-convolution_param { num_output: 2048 kernel_size: 1 stride: 1 
- weight_filler { type: "xavier" } bias_filler { type: "constant" value: 1.0 } } }
-layers { bottom: "flow_comb" top: "flow_comb" name: "relu" type: RELU }
-
-layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb' 
-	top: 'consilience' eltwise_param { operation: PROD } }
-
-# fully connected layer of consiliencenet
-layers { bottom: "consilience" top: "cons_fc6" name: "cons_fc6" type: INNER_PRODUCT
-  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0
-  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
-    bias_filler { type: "constant" value: 0.1 } } }
-layers { bottom: "cons_fc6" top: "cons_fc6" name: "cons_relu6" type: RELU }
-layers { bottom: "cons_fc6" top: "cons_fc6" name: "cons_drop6" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
-
-layers { bottom: "cons_fc6" top: "cons_fc7" name: "cons_fc7"
-  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
-  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
-    bias_filler { type: "constant" value: 0.1 } } }
-layers { bottom: "cons_fc7" top: "cons_fc7" name: "cons_relu7" type: RELU }
-layers { bottom: "cons_fc7" top: "cons_fc7" name: "cons_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
-
-layers { bottom: "cons_fc7" top: "cons_fc8" name: "cons_fc8"
-  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
-  inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
-    bias_filler { type: "constant" value: 0.1 } } }
-
-# softmax output of rgb, flow, and consiliencel yaers
-layers { name: "rgb_prob" type: SOFTMAX bottom: "rgb_fc8" top: "rgb_prob" }
-layers { name: "flow_prob" type: SOFTMAX bottom: "flow_fc8" top: "flow_prob" }
-layers { name: "cons_prob" type: SOFTMAX bottom: "cons_fc8" top: "cons_prob" }
-
-# concatenation of rgb, flow, and consilience layer
-layers { type: CONCAT name: 'concat' bottom: 'rgb_prob' bottom: 'flow_prob' bottom: 'cons_prob'
+# concatenation of rgb and flow layer
+layers { type: CONCAT name: 'concat' bottom: 'rgb_fc8' bottom: 'flow_fc8'
 	top: 'concat' concat_param { concat_dim: 1 } }
 
 layers { bottom: "concat" top: "fusion_fc9" name: "fusion_fc9"
   blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
-  inner_product_param { num_output: 4096 weight_filler { type: "xavier" }
-    bias_filler { type: "xavier" } } }
-layers { bottom: "fusion_fc7" top: "fusion_fc7" name: "fusion_relu7" type: RELU }
-layers { bottom: "fusion_fc7" top: "fusion_fc7" name: "fusion_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
-
-layers { bottom: "fusion_fc9" top: "fusion_fc10" name: "fusion_fc10"
-  blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
   inner_product_param { num_output: 101 weight_filler { type: "xavier" }
     bias_filler { type: "xavier" } } }
-layers { name: "accuracy" type: ACCURACY bottom: "fusion_fc10" bottom: "label" top: "accuracy" include: { phase: TEST } }
-layers { name: "loss" type: SOFTMAX_LOSS bottom: "fusion_fc10" bottom: "label" top: "loss" }
+layers { name: "accuracy" type: ACCURACY bottom: "fusion_fc9" bottom: "label" top: "accuracy" include: { phase: TEST } }
+layers { name: "loss" type: SOFTMAX_LOSS bottom: "fusion_fc9" bottom: "label" top: "loss" }

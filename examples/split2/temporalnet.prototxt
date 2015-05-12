@@ -12,7 +12,7 @@ type: VIDEO_DATA
 #    backend: LMDB
 #  }
   video_data_param {
-    source: "data/ucf101/train1.txt"
+    source: "data/ucf101/train2.txt"
     root_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
     batch_size: 64
@@ -39,7 +39,7 @@ type: VIDEO_DATA
 #    backend: LMDB
 #  }
   video_data_param {
-    source: "data/ucf101/test1.txt"
+    source: "data/ucf101/test2.txt"
     root_dir: "data/ucf101/ucf101_opt/"
     batch_size: 50
 		num_channels: 10

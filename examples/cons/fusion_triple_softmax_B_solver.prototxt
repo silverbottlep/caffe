@@ -1,7 +1,7 @@
-net: "examples/cons/fusion_twostream_softmax.prototxt"
+net: "examples/cons/fusion_triple_softmax_B.prototxt"
 test_iter: 80
 test_interval: 1000
-base_lr: 0.001
+base_lr: 0.01
 iter_size: 2
 average_loss: 100
 lr_policy: "step"
@@ -12,5 +12,5 @@ max_iter: 40000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 40000
-snapshot_prefix: "examples/cons/snapshot/fusion_twostream_softmax"
+snapshot_prefix: "examples/cons/snapshot/fusion_triple_softmax_B"
 solver_mode: GPU

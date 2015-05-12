@@ -188,12 +188,12 @@ layers { bottom: "concat" top: "fusion_fc9" name: "fusion_fc9"
   blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
   inner_product_param { num_output: 4096 weight_filler { type: "xavier" }
     bias_filler { type: "xavier" } } }
-layers { bottom: "fusion_fc7" top: "fusion_fc7" name: "fusion_relu7" type: RELU }
-layers { bottom: "fusion_fc7" top: "fusion_fc7" name: "fusion_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+layers { bottom: "fusion_fc9" top: "fusion_fc9" name: "fusion_relu7" type: RELU }
+layers { bottom: "fusion_fc9" top: "fusion_fc9" name: "fusion_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
 
 layers { bottom: "fusion_fc9" top: "fusion_fc10" name: "fusion_fc10"
   blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
   inner_product_param { num_output: 101 weight_filler { type: "xavier" }
     bias_filler { type: "xavier" } } }
 layers { name: "accuracy" type: ACCURACY bottom: "fusion_fc10" bottom: "label" top: "accuracy" include: { phase: TEST } }
-layers { name: "loss" type: SOFTMAX_LOSS bottom: "fusion_fc10" bottom: "label" top: "loss" }
+layers { name: "loss" type: HINGE_LOSS bottom: "fusion_fc10" bottom: "label" top: "loss" }

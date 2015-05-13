@@ -1,0 +1,205 @@
+name: "VGG19_CONSILIENCENET"
+
+input: "rgbdata"
+input_dim: 10
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+input: "flowdata"
+input_dim: 10
+input_dim: 20
+input_dim: 224
+input_dim: 224
+
+# spatialnet
+layers { bottom: "rgbdata" top: "rgb_conv1_1" name: "rgb_conv1_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 64 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv1_1" top: "rgb_conv1_1" name: "relu1_1" type: RELU }
+layers { bottom: "rgb_conv1_1" top: "rgb_conv1_2" name: "rgb_conv1_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 64 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv1_2" top: "rgb_conv1_2" name: "relu1_2" type: RELU }
+layers { bottom: "rgb_conv1_2" top: "pool1" name: "pool1" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool1" top: "rgb_conv2_1" name: "rgb_conv2_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 128 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv2_1" top: "rgb_conv2_1" name: "relu2_1" type: RELU }
+layers { bottom: "rgb_conv2_1" top: "rgb_conv2_2" name: "rgb_conv2_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 128 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv2_2" top: "rgb_conv2_2" name: "relu2_2" type: RELU }
+layers { bottom: "rgb_conv2_2" top: "pool2" name: "pool2" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool2" top: "rgb_conv3_1" name: "rgb_conv3_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_1" top: "rgb_conv3_1" name: "relu3_1" type: RELU }
+layers { bottom: "rgb_conv3_1" top: "rgb_conv3_2" name: "rgb_conv3_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_2" top: "rgb_conv3_2" name: "relu3_2" type: RELU }
+layers { bottom: "rgb_conv3_2" top: "rgb_conv3_3" name: "rgb_conv3_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_3" top: "rgb_conv3_3" name: "relu3_3" type: RELU }
+layers { bottom: "rgb_conv3_3" top: "rgb_conv3_4" name: "rgb_conv3_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv3_4" top: "rgb_conv3_4" name: "relu3_4" type: RELU }
+layers { bottom: "rgb_conv3_4" top: "pool3" name: "pool3" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool3" top: "rgb_conv4_1" name: "rgb_conv4_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_1" top: "rgb_conv4_1" name: "relu4_1" type: RELU }
+layers { bottom: "rgb_conv4_1" top: "rgb_conv4_2" name: "rgb_conv4_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_2" top: "rgb_conv4_2" name: "relu4_2" type: RELU }
+layers { bottom: "rgb_conv4_2" top: "rgb_conv4_3" name: "rgb_conv4_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_3" top: "rgb_conv4_3" name: "relu4_3" type: RELU }
+layers { bottom: "rgb_conv4_3" top: "rgb_conv4_4" name: "rgb_conv4_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv4_4" top: "rgb_conv4_4" name: "relu4_4" type: RELU }
+layers { bottom: "rgb_conv4_4" top: "pool4" name: "pool4" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+layers { bottom: "pool4" top: "rgb_conv5_1" name: "rgb_conv5_1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_1" top: "rgb_conv5_1" name: "relu5_1" type: RELU }
+layers { bottom: "rgb_conv5_1" top: "rgb_conv5_2" name: "rgb_conv5_2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_2" top: "rgb_conv5_2" name: "relu5_2" type: RELU }
+layers { bottom: "rgb_conv5_2" top: "rgb_conv5_3" name: "rgb_conv5_3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_3" top: "rgb_conv5_3" name: "relu5_3" type: RELU }
+layers { bottom: "rgb_conv5_3" top: "rgb_conv5_4" name: "rgb_conv5_4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 pad: 1 kernel_size: 3 } }
+layers { bottom: "rgb_conv5_4" top: "rgb_conv5_4" name: "relu5_4" type: RELU }
+layers { bottom: "rgb_conv5_4" top: "rgb_feat" name: "rgb_pool5" type: POOLING
+  pooling_param { pool: MAX kernel_size: 2 stride: 2 } }
+
+# fully connected layer of spatialnet
+layers { bottom: "rgb_feat" top: "rgb_fc6" name: "rgb_fc6" type: INNER_PRODUCT
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "rgb_fc6" top: "rgb_fc6" name: "rgb_relu6" type: RELU }
+layers { bottom: "rgb_fc6" top: "rgb_fc6" name: "rgb_drop6" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "rgb_fc6" top: "rgb_fc7" name: "rgb_fc7"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "rgb_fc7" top: "rgb_fc7" name: "rgb_relu7" type: RELU }
+layers { bottom: "rgb_fc7" top: "rgb_fc7" name: "rgb_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "rgb_fc7" top: "rgb_fc8" name: "rgb_fc8"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+
+# temporalnet
+layers { bottom: "flowdata" top: "flow_conv1" name: "flow_conv1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 } }
+layers { bottom: "flow_conv1" top: "flow_conv1" name: "flow_relu1" type: RELU }
+layers { bottom: "flow_conv1" top: "flow_norm1" name: "flow_norm1" type: LRN
+  lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
+layers { bottom: "flow_norm1" top: "flow_pool1" name: "flow_pool1" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+layers { bottom: "flow_pool1" top: "flow_conv2" name: "flow_conv2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 kernel_size: 5 stride: 2 pad: 2 } }
+layers { bottom: "flow_conv2" top: "flow_conv2" name: "flow_relu2" type: RELU }
+layers { bottom: "flow_conv2" top: "flow_pool2" name: "flow_pool2" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+layers { bottom: "flow_pool2" top: "flow_conv3" name: "flow_conv3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "flow_conv3" top: "flow_conv3" name: "flow_relu3" type: RELU }
+layers { bottom: "flow_conv3" top: "flow_conv4" name: "flow_conv4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "flow_conv4" top: "flow_conv4" name: "flow_relu4" type: RELU }
+layers { bottom: "flow_conv4" top: "flow_conv5" name: "flow_conv5" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "flow_conv5" top: "flow_conv5" name: "flow_relu5" type: RELU }
+layers { bottom: "flow_conv5" top: "flow_feat" name: "flow_pool5" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+
+# fully connected layer of temporalnet
+layers { bottom: "flow_feat" top: "flow_fc6" name: "flow_fc6" type: INNER_PRODUCT
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "flow_fc6" top: "flow_fc6" name: "flow_relu6" type: RELU }
+layers { bottom: "flow_fc6" top: "flow_fc6" name: "flow_drop6" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "flow_fc6" top: "flow_fc7" name: "flow_fc7"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 2048 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "flow_fc7" top: "flow_fc7" name: "flow_relu7" type: RELU }
+layers { bottom: "flow_fc7" top: "flow_fc7" name: "flow_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "flow_fc7" top: "flow_fc8" name: "flow_fc8"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+
+# consilience
+
+# temporalnet(consilience, with padding)
+layers { bottom: "flowdata" top: "_flow_conv1" name: "flow_conv1" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 96 kernel_size: 7 stride: 2 pad:1 } }
+layers { bottom: "_flow_conv1" top: "_flow_conv1" name: "flow_relu1" type: RELU }
+layers { bottom: "_flow_conv1" top: "_flow_norm1" name: "flow_norm1" type: LRN
+  lrn_param { local_size: 5 alpha: 0.0001 beta: 0.75 } }
+layers { bottom: "_flow_norm1" top: "_flow_pool1" name: "flow_pool1" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+layers { bottom: "_flow_pool1" top: "_flow_conv2" name: "flow_conv2" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 256 kernel_size: 5 stride: 2 pad: 2 } }
+layers { bottom: "_flow_conv2" top: "_flow_conv2" name: "flow_relu2" type: RELU }
+layers { bottom: "_flow_conv2" top: "_flow_pool2" name: "flow_pool2" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+layers { bottom: "_flow_pool2" top: "_flow_conv3" name: "flow_conv3" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "_flow_conv3" top: "_flow_conv3" name: "flow_relu3" type: RELU }
+layers { bottom: "_flow_conv3" top: "_flow_conv4" name: "flow_conv4" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "_flow_conv4" top: "_flow_conv4" name: "flow_relu4" type: RELU }
+layers { bottom: "_flow_conv4" top: "_flow_conv5" name: "flow_conv5" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 3 stride: 1 pad: 1 } }
+layers { bottom: "_flow_conv5" top: "_flow_conv5" name: "flow_relu5" type: RELU }
+layers { bottom: "_flow_conv5" top: "_flow_feat" name: "flow_pool5" type: POOLING
+  pooling_param { pool: MAX kernel_size: 3 stride: 2 } }
+
+layers { bottom: "rgb_feat" top: "rgb_comb" name: "rgb_comb" type: CONVOLUTION
+ blobs_lr: 1 blobs_lr: 0  weight_decay: 1 weight_decay: 0
+convolution_param { num_output: 1024 kernel_size: 1 stride: 1 
+ weight_filler { type: "xavier" } bias_filler { type: "constant" value: 1 } } }
+layers { bottom: "rgb_comb" top: "rgb_comb" name: "relu1" type: RELU }
+
+layers { bottom: "_flow_feat" top: "flow_comb" name: "flow_comb" type: CONVOLUTION
+ blobs_lr: 1 blobs_lr: 0  weight_decay: 1 weight_decay: 0
+convolution_param { num_output: 1024 kernel_size: 1 stride: 1 
+ weight_filler { type: "xavier" } bias_filler { type: "constant" value: 1 } } }
+layers { bottom: "flow_comb" top: "flow_comb" name: "relu2" type: RELU }
+
+ layers { type: ELTWISE name: 'consilience' bottom: 'rgb_comb' bottom: 'flow_comb' 
+	top: 'consilience' eltwise_param { operation: PROD } }
+
+# fully connected layer of consiliencenet
+layers { bottom: "consilience" top: "cons_fc6" name: "cons_fc6" type: INNER_PRODUCT
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0
+  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "cons_fc6" top: "cons_fc6" name: "cons_relu6" type: RELU }
+layers { bottom: "cons_fc6" top: "cons_fc6" name: "cons_drop6" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "cons_fc6" top: "cons_fc7" name: "cons_fc7"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 4096 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+layers { bottom: "cons_fc7" top: "cons_fc7" name: "cons_relu7" type: RELU }
+layers { bottom: "cons_fc7" top: "cons_fc7" name: "cons_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
+
+layers { bottom: "cons_fc7" top: "cons_fc8" name: "cons_fc8"
+  blobs_lr: 0 blobs_lr: 0 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
+  inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
+    bias_filler { type: "constant" value: 0.1 } } }
+
+# L2 normalization
+layers { bottom: "rgb_fc8" top: "rgb_fc8" name: "rgb_norm" type: NORMALIZE }
+layers { bottom: "flow_fc8" top: "flow_fc8" name: "flow_norm" type: NORMALIZE }
+layers { bottom: "cons_fc8" top: "cons_fc8" name: "cons_norm" type: NORMALIZE }

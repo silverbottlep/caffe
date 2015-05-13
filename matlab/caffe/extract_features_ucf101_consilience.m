@@ -1,12 +1,16 @@
 rgb_dir = '../../data/ucf101/ucf101_image/';
 flow_dir = '../../data/ucf101/ucf101_opt/';
-list_file = '../../data/ucf101/train1.txt';
-%list_file = '../../data/ucf101/test1.txt';
+list_file = '../../data/ucf101/split_A.txt';
+%list_file = '../../data/ucf101/split_B.txt';
+%list_file = '../../data/ucf101/split_C.txt';
+%list_file = '../../data/ucf101/split_D.txt';
+%list_file = '../../data/ucf101/split_E.txt';
+%list_file = '../../data/ucf101/split_F.txt';
 
-%model_file = '../../examples/consilience/snapshot/consilience_nonorm_d2048_drop7_iter_60000.caffemodel';
-%model_file = '../../examples/consilience/snapshot/consilience_nonorm_d2048_drop7_bias_iter_40000.caffemodel';
-model_def_file = '../../examples/cons/fusion_triple_deploy.prototxt';
-model_file = '../../examples/cons/snapshot/fusion_triple.caffemodel';
+%model_def_file = '../../examples/cons/fusion_triple_deploy.prototxt';
+%model_file = '../../examples/cons/snapshot/fusion_triple.caffemodel';
+model_def_file = '../../examples/cons/vgg19_fusion_triple_deploy.prototxt';
+model_file = '../../examples/cons/snapshot/vgg19_fusion_triple.caffemodel';
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
@@ -115,16 +119,14 @@ for i=1:num_item
 	toc;
 end
 
-train.rgb_feat = rgb_feat;
-train.flow_feat = flow_feat;
-train.cons_feat = cons_feat;
-train.label = item_label;
-train.item_name = item_name;
-save('train_split1.mat', 'train');
-
-%test.rgb_feat = rgb_feat;
-%test.flow_feat = flow_feat;
-%test.cons_feat = cons_feat;
-%test.label = item_label;
-%test.item_name = item_name;
-%save('test_split1.mat', 'test');
+dataset.rgb_feat = rgb_feat;
+dataset.flow_feat = flow_feat;
+dataset.cons_feat = cons_feat;
+dataset.label = item_label;
+dataset.item_name = item_name;
+save('vgg19_test_split1_A.mat', 'dataset');
+%save('vgg19_test_split1_B.mat', 'dataset');
+%save('vgg19_test_split1_C.mat', 'dataset');
+%save('vgg19_test_split1_D.mat', 'dataset');
+%save('vgg19_test_split1_E.mat', 'dataset');
+%save('vgg19_test_split1_F.mat', 'dataset');

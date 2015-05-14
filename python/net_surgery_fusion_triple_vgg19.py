@@ -8,7 +8,7 @@ model_root = '/home/eunbyung/Works/src/caffe/examples/cons/'
 #temporalnet_proto_file = model_root + 'temporalnet_ft.prototxt'
 spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_vgg19_ft_iter_60000.caffemodel'
 temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
-consiliencenet_param_file = model_root + 'snapshot/' + 'vgg19_consilience_nonorm_d1024_drop7_bias_iter_40000.caffemodel'
+consiliencenet_param_file = model_root + 'snapshot/' + 'vgg19_consilience_nonorm_d1024_drop7_bias_iter_60000.caffemodel'
 
 fusion_proto_file = model_root + 'vgg19_fusion_triple.prototxt'
 fusion_param_file = model_root + 'snapshot/' + 'vgg19_fusion_triple.caffemodel'

@@ -199,7 +199,12 @@ layers { bottom: "cons_fc7" top: "cons_fc8" name: "cons_fc8"
   inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
     bias_filler { type: "constant" value: 0.1 } } }
 
+# softmax probability
+layers { name: "rgb_prob" type: SOFTMAX bottom: "rgb_fc8" top: "rgb_prob" }
+layers { name: "flow_prob" type: SOFTMAX bottom: "flow_fc8" top: "flow_prob" }
+layers { name: "cons_prob" type: SOFTMAX bottom: "cons_fc8" top: "cons_prob" }
+
 # L2 normalization
-layers { bottom: "rgb_fc8" top: "rgb_fc8" name: "rgb_norm" type: NORMALIZE }
-layers { bottom: "flow_fc8" top: "flow_fc8" name: "flow_norm" type: NORMALIZE }
-layers { bottom: "cons_fc8" top: "cons_fc8" name: "cons_norm" type: NORMALIZE }
+#layers { bottom: "rgb_fc8" top: "rgb_fc8" name: "rgb_norm" type: NORMALIZE }
+#layers { bottom: "flow_fc8" top: "flow_fc8" name: "flow_norm" type: NORMALIZE }
+#layers { bottom: "cons_fc8" top: "cons_fc8" name: "cons_norm" type: NORMALIZE }

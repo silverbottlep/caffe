@@ -7,10 +7,10 @@ flow_dir = '../../data/ucf101/ucf101_opt/';
 %list_file = '../../data/ucf101/split_E.txt';
 list_file = '../../data/ucf101/split_F.txt';
 
-model_def_file = '../../examples/cons/fusion_triple_deploy.prototxt';
-model_file = '../../examples/cons/snapshot/fusion_triple.caffemodel';
-%model_def_file = '../../examples/cons/vgg19_fusion_triple_deploy.prototxt';
-%model_file = '../../examples/cons/snapshot/vgg19_fusion_triple.caffemodel';
+%model_def_file = '../../examples/cons/fusion_triple_deploy.prototxt';
+%model_file = '../../examples/cons/snapshot/fusion_triple.caffemodel';
+model_def_file = '../../examples/cons/vgg19_fusion_triple_deploy.prototxt';
+model_file = '../../examples/cons/snapshot/vgg19_fusion_triple.caffemodel';
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
@@ -124,12 +124,6 @@ dataset.flow_feat = flow_feat;
 dataset.cons_feat = cons_feat;
 dataset.label = item_label;
 dataset.item_name = item_name;
-%save('feat_split1_A.mat', 'dataset');
-%save('feat_split1_B.mat', 'dataset');
-%save('feat_split1_C.mat', 'dataset');
-%save('feat_split1_D.mat', 'dataset');
-%save('feat_split1_E.mat', 'dataset');
-save('feat_split1_F.mat', 'dataset');
 
 %save('feat_split1_A.mat', 'dataset');
 %save('feat_split1_B.mat', 'dataset');
@@ -137,3 +131,10 @@ save('feat_split1_F.mat', 'dataset');
 %save('feat_split1_D.mat', 'dataset');
 %save('feat_split1_E.mat', 'dataset');
 %save('feat_split1_F.mat', 'dataset');
+
+%save('vgg19_feat_split1_A.mat', 'dataset');
+%save('vgg19_feat_split1_B.mat', 'dataset');
+%save('vgg19_feat_split1_C.mat', 'dataset');
+%save('vgg19_feat_split1_D.mat', 'dataset');
+%save('vgg19_feat_split1_E.mat', 'dataset');
+save('vgg19_feat_split1_F.mat', 'dataset');

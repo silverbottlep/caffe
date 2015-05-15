@@ -9,7 +9,6 @@ layers {
     source: "data/ucf101/train2.txt"
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_optmag/"
-    minmax_dir: "data/ucf101/ucf101_minmax/"
 		shuffle: true
     batch_size: 64
 		flow_size: 14
@@ -31,7 +30,6 @@ layers {
     source: "data/ucf101/test2.txt"
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_optmag/"
-    minmax_dir: "data/ucf101/ucf101_minmax/"
     batch_size: 50
 		flow_size: 14
   }

@@ -10,5 +10,5 @@ max_iter: 60000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 10000
-snapshot_prefix: "examples/twostream/snapshot/spatialnet_vgg19_ft_consilience_B_2"
+snapshot_prefix: "examples/twostream/snapshot/spatialnet_vgg19_ft_consilience_B_3"
 solver_mode: GPU

@@ -45,7 +45,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 64
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -64,7 +64,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 64
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -94,7 +94,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 128
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -113,7 +113,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 128
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -143,7 +143,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -162,7 +162,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -181,7 +181,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }
@@ -200,7 +200,7 @@ layers {
   blobs_lr: 0
   convolution_param {
     num_output: 256
-    pad: 0
+    pad: 1
     kernel_size: 3
   }
 }

@@ -1,15 +1,17 @@
-name: "SPATIAL_NET_VGG19"
+name: "CONSILIENCENET_VGG19_FT"
 layers {
   name: "data"
-  type: VIDEO_DATA
+  type: CONSILIENCE_DATA
   top: "data"
   top: "label"
-  video_data_param {
-    source: "data/ucf101/train3.txt"
-    root_dir: "data/ucf101/ucf101_image/"
+  top: "flow"
+  consilience_data_param {
+    source: "data/ucf101/train2.txt"
+    image_dir: "data/ucf101/ucf101_image/"
+    flow_dir: "data/ucf101/ucf101_optmag/"
 		shuffle: true
     batch_size: 64
-		input_type: IMAGE
+		flow_size: 14
   }
   transform_param {
     crop_size: 224
@@ -20,14 +22,16 @@ layers {
 }
 layers {
   name: "data"
-  type: VIDEO_DATA
+  type: CONSILIENCE_DATA
   top: "data"
   top: "label"
-  video_data_param {
-    source: "data/ucf101/test3.txt"
-    root_dir: "data/ucf101/ucf101_image/"
+  top: "flow"
+  consilience_data_param {
+    source: "data/ucf101/test2.txt"
+    image_dir: "data/ucf101/ucf101_image/"
+    flow_dir: "data/ucf101/ucf101_optmag/"
     batch_size: 50
-		input_type: IMAGE
+		flow_size: 14
   }
   transform_param {
     crop_size: 224
@@ -359,6 +363,7 @@ layers {
     kernel_size: 3
   }
 }
+
 layers {
   bottom: "conv5_3"
   top: "conv5_3"
@@ -378,6 +383,14 @@ layers {
     kernel_size: 3
   }
 }
+
+layers { bottom: "flow" top: "flow1" name: "flowconv" type: CONVOLUTION
+  blobs_lr: 0 blobs_lr: 0 convolution_param { num_output: 512 kernel_size: 1 stride: 1
+    weight_filler { type: "constant" value: 1 }
+    bias_filler { type: "constant" value: 0 } } }
+layers { type: ELTWISE name: 'consilience' bottom: 'conv5_4' bottom: 'flow1' top: 'conv5_4'
+  eltwise_param { operation: PROD } }
+
 layers {
   bottom: "conv5_4"
   top: "conv5_4"
@@ -397,8 +410,8 @@ layers {
 }
 layers {
   bottom: "pool5"
-  top: "fc6_ucf101"
-  name: "fc6_ucf101"
+  top: "fc6"
+  name: "fc6"
   blobs_lr: 1
   blobs_lr: 2
   weight_decay: 1
@@ -417,24 +430,24 @@ layers {
   }
 }
 layers {
-  bottom: "fc6_ucf101"
-  top: "fc6_ucf101"
+  bottom: "fc6"
+  top: "fc6"
   name: "relu6"
   type: RELU
 }
 layers {
-  bottom: "fc6_ucf101"
-  top: "fc6_ucf101"
+  bottom: "fc6"
+  top: "fc6"
   name: "drop6"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layers {
-  bottom: "fc6_ucf101"
-  top: "fc7_ucf101"
-  name: "fc7_ucf101"
+  bottom: "fc6"
+  top: "fc7"
+  name: "fc7"
   type: INNER_PRODUCT
   blobs_lr: 1
   blobs_lr: 2
@@ -453,22 +466,22 @@ layers {
   }
 }
 layers {
-  bottom: "fc7_ucf101"
-  top: "fc7_ucf101"
+  bottom: "fc7"
+  top: "fc7"
   name: "relu7"
   type: RELU
 }
 layers {
-  bottom: "fc7_ucf101"
-  top: "fc7_ucf101"
+  bottom: "fc7"
+  top: "fc7"
   name: "drop7"
   type: DROPOUT
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layers {
-	bottom: "fc7_ucf101"
+  bottom: "fc7"
   top: "fc8_ucf101"
   name: "fc8_ucf101"
   blobs_lr: 1

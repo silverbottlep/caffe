@@ -3,17 +3,17 @@ flow_dir = '../../data/ucf101/ucf101_optmag/';
 list_file = '../../data/ucf101/test2.txt';
 
 % get full model weight
-model_def_file = '../../examples/twostream/spatialnet_ft_consilience_deploy.prototxt';
-model_file = '../../examples/split2/snapshot/spatialnet_ft_consilience_B_1_iter_45000.caffemodel';
-output_name = 'rgb_consilience_result_split2.mat';
-batch = 1;
-FLOW_DIM = 13;
+%model_def_file = '../../examples/twostream/spatialnet_ft_consilience_deploy.prototxt';
+%model_file = '../../examples/split2/snapshot/spatialnet_ft_consilience_B_1_iter_45000.caffemodel';
+%output_name = 'rgb_consilience_result_split2.mat';
+%batch = 1;
+%FLOW_DIM = 13;
 
-%model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_consilience_deploy.prototxt';
-%model_file = '../../examples/twostream/snapshot/spatialnet_vgg19_ft_consilience_B_3_iter_60000.caffemodel';
-%output_name = 'rgb_vgg19_consilience_result.mat';
-%batch = 5;
-%FLOW_DIM = 14;
+model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_consilience_deploy.prototxt';
+model_file = '../../examples/split2/snapshot/spatialnet_vgg19_ft_consilience_B_4_iter_60000.caffemodel';
+output_name = 'rgb_vgg19_consilience_result_split2.mat';
+batch = 5;
+FLOW_DIM = 14;
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);

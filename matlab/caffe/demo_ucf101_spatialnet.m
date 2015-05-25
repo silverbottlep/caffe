@@ -1,18 +1,22 @@
 src_dir = '../../data/ucf101/ucf101_image/';
-list_file = '../../data/ucf101/test1.txt';
+list_file = '../../data/ucf101/test3.txt';
 
 %model_def_file = '../../examples/twostream/spatialnet_ft_deploy.prototxt';
-%model_file = '../../examples/twostream/snapshot/spatialnet_ft_iter_45000.caffemodel';
-%output_name = 'rgb_result.mat';
+%model_file = '../../examples/split3/snapshot/spatialnet_ft_iter_45000.caffemodel';
+%output_name = 'rgb_result_split3.mat';
 %batch = 1;
 
-model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/spatialnet_vgg19_ft_iter_60000.caffemodel';
-output_name = 'rgb_vgg19_result.mat';
+% for vgg19, different layer name( fc6 : fc6_ucf101 ), so we need to have different deploy file
+% because of pool5 feature map size( 6x6, 7x7)
+%model_def_file = '../../examples/twostream/spatialnet_vgg19_ft_deploy.prototxt';
+model_def_file = '../../examples/split3/spatialnet_vgg19_ft_deploy.prototxt';
+model_file = '../../examples/split3/snapshot/spatialnet_vgg19_ft_iter_60000.caffemodel';
+output_name = 'rgb_vgg19_result_split3.mat';
 batch = 5;
 
 use_gpu = true;
-matcaffe_init(use_gpu, model_def_file, model_file, 2);
+matcaffe_init(use_gpu, model_def_file, model_file);
+caffe('set_device',0);
 
 image_mean = imread('../../data/ucf101/ucf101_rgb_mean.binaryproto.jpg');
 IMAGE_MEAN = single(image_mean(:,:,[3 2 1]));

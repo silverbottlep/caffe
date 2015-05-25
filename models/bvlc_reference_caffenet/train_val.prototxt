@@ -329,18 +329,41 @@ layers {
     }
   }
 }
-layers {
-  name: "accuracy"
-  type: ACCURACY
-  bottom: "fc8"
-  bottom: "label"
-  top: "accuracy"
-  include: { phase: TEST }
-}
+#layers {
+#  name: "accuracy"
+#  type: ACCURACY
+#  bottom: "fc8"
+#  bottom: "label"
+#  top: "accuracy"
+#  include: { phase: TEST }
+#}
 layers {
   name: "loss"
   type: SOFTMAX_LOSS
   bottom: "fc8"
   bottom: "label"
   top: "loss"
+}
+layers {
+  bottom: "fc8"
+  bottom: "label"
+  top: "loss/top-1"
+  name: "loss/top-1"
+  type: ACCURACY
+  include {
+    phase: TEST
+  }
+}
+layers {
+  bottom: "fc8"
+  bottom: "label"
+  top: "loss/top-5"
+  name: "loss/top-5"
+  type: ACCURACY
+  accuracy_param {
+    top_k: 5
+  }
+  include {
+    phase: TEST
+  }
 }

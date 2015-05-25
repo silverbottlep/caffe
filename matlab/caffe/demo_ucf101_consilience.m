@@ -19,8 +19,8 @@ list_file = '../../data/ucf101/test1.txt';
 %model_file = '../../examples/consilience/snapshot/baseline_A_iter_60000.caffemodel';
 %model_def_file = '../../examples/cons/fusion_triple_fc7_deploy.prototxt';
 %model_file = '../../examples/cons/snapshot/fusion_triple_fc7_iter_40000.caffemodel';
-model_def_file = '../../examples/consilience/vgg19_baseline_A_deploy.prototxt';
-model_file = '../../examples/consilience/snapshot/vgg19_baseline_A_iter_40000.caffemodel';
+model_def_file = '../../examples/consilience/vgg19_baseline_B_deploy.prototxt';
+model_file = '../../examples/consilience/snapshot/vgg19_baseline_B_iter_40000.caffemodel';
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
@@ -116,5 +116,5 @@ end
 %save('fusion_triple_fc8.mat', 'consilience_result');
 %save('fusion_triple_fc7.mat', 'consilience_result');
 %save('baseline_A.mat', 'consilience_result');
-save('vgg19_baseline_A.mat', 'consilience_result');
+save('vgg19_baseline_B.mat', 'consilience_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

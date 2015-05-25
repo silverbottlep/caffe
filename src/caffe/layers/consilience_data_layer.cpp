@@ -46,8 +46,15 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
   string filename;
   int label, nframes;
 	float min, max;
+	struct data_item cons_item;
   while (infile >> filename >> label >> nframes >> min >> max) {
-    lines_.push_back(std::make_pair(std::make_pair(filename, label), nframes));
+		cons_item.filename = filename;
+		cons_item.label = label;
+		cons_item.nframes = nframes;
+		cons_item.min = min;
+		cons_item.max = max;
+    lines_.push_back(cons_item);
+    //lines_.push_back(std::make_pair(std::make_pair(filename, label), nframes));
     //lines_.push_back(std::make_pair(filename, label));
   }
 
@@ -79,16 +86,16 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
 	t_param.w_off = 0;
 	t_param.mirrored = 0;
 	path framename(image_dir);
-	framename /= lines_[lines_id_].first.first; 
-	framename /= lines_[lines_id_].first.first + "_f0001.jpg";
-	CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+	framename /= lines_[lines_id_].filename;
+	framename /= lines_[lines_id_].filename + "_f0001.jpg";
+	CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].label,
 				new_height, new_width, &datum));
 		
   const int crop_size = this->layer_param_.transform_param().crop_size();
   const int batch_size = this->layer_param_.consilience_data_param().batch_size();
   switch (consilience_data_param.input_type()) {
 		case ConsilienceDataParameter_InputType_OPTFLOW:
-			CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
+			CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].filename,
 				1, new_height, new_width, &flow_datum, &t_param, flow_size));
 			if (crop_size > 0) {
 				(*top)[0]->Reshape(batch_size, datum.channels(), crop_size, crop_size);
@@ -108,9 +115,10 @@ void ConsilienceDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bot
 						flow_datum.height(), flow_datum.width());
 			}
 			break;
+		case ConsilienceDataParameter_InputType_CONSILIENCE_RESCALE:
 		case ConsilienceDataParameter_InputType_CONSILIENCE:
-			CHECK(ReadFlowToDatum(flow_dir, lines_[lines_id_].first.first, 
-				lines_[lines_id_].first.second, 1, num_channels, 
+			CHECK(ReadFlowToDatum(flow_dir, lines_[lines_id_].filename,
+				lines_[lines_id_].label, 1, num_channels, 
 				new_height, new_width, &flow_datum));
 			if (crop_size > 0) {
 				(*top)[0]->Reshape(batch_size*rgb_num_channels, datum.channels(), crop_size, crop_size);
@@ -197,7 +205,7 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     // get a blob
     CHECK_GT(lines_size, lines_id_);
-		int nframes = lines_[lines_id_].second;
+		int nframes = lines_[lines_id_].nframes;
 		int start_frame = (rand()%(nframes-num_channels-1))+1;
 		struct transform_param t_param;
 		
@@ -205,9 +213,9 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 		char numstr[7]={0};
 		sprintf(numstr,"_f%04d",start_frame+(num_channels/2)-1);
 		string numstr_string(numstr);
-		framename /= lines_[lines_id_].first.first; 
-		framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";
-		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+		framename /= lines_[lines_id_].filename;
+		framename /= lines_[lines_id_].filename + numstr_string + ".jpg";
+		CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].label,
 					new_height, new_width, &datum));
 		this->data_transformer_.Transform(item_id, datum, this->mean_, top_data, &t_param);
 
@@ -217,9 +225,9 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 				char numstr[7]={0};
 				sprintf(numstr,"_f%04d",start_frame+frame);
 				string numstr_string(numstr);
-				framename /= lines_[lines_id_].first.first; 
-				framename /= lines_[lines_id_].first.first + numstr_string + ".jpg";
-				CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].first.second, 
+				framename /= lines_[lines_id_].filename;
+				framename /= lines_[lines_id_].filename + numstr_string + ".jpg";
+				CHECK(ReadImageToDatum(framename.string(), lines_[lines_id_].label,
 							new_height, new_width, &datum));
 				this->data_transformer_.Transform2(frame*batch_size + item_id, datum, this->mean_, top_data, t_param);
 			}
@@ -227,7 +235,7 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 
 		if (consilience_data_param.input_type() == caffe::ConsilienceDataParameter_InputType_OPTFLOW) {
 			// read optical flow image, crop it, mirroring, resize it to 13,13(conv5)
-			CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].first.first, 
+			CHECK(ReadFlowMagnitude(flow_dir, lines_[lines_id_].filename,
 						start_frame, new_height, new_width, &flow_datum, &t_param, flow_height));
 			const string& flow_data = flow_datum.data();
 			for (int h = 0; h < flow_height; ++h) {
@@ -239,12 +247,18 @@ void ConsilienceDataLayer<Dtype>::InternalThreadEntry() {
 				}
 			}
 		} else {
-			if (!ReadFlowToDatum(flow_dir,lines_[lines_id_].first.first, 
-						lines_[lines_id_].first.second, start_frame, num_channels, 
+			if (!ReadFlowToDatum(flow_dir,lines_[lines_id_].filename,
+						lines_[lines_id_].label, start_frame, num_channels, 
 						new_height, new_width, &flow_datum)){
 				continue;
 			}
-			this->data_transformer_.ConsilienceTransform(item_id, flow_datum, this->flow_mean_, top_data2, t_param);
+			if (consilience_data_param.input_type() == caffe::ConsilienceDataParameter_InputType_CONSILIENCE) {
+				this->data_transformer_.ConsilienceTransform(item_id, flow_datum, this->flow_mean_, top_data2, t_param);
+			}
+			else if (consilience_data_param.input_type() == caffe::ConsilienceDataParameter_InputType_CONSILIENCE_RESCALE) {
+				this->data_transformer_.ConsilienceRescaleTransform(item_id, flow_datum, lines_[lines_id_].min, lines_[lines_id_].max,
+						this->flow_mean_, top_data2, t_param);
+			}
 		}
 //		LOG(INFO) << lines_[lines_id_].first.first << " label:" << datum.label() << " nframes: " << nframes << " start_frame: " << start_frame << " h_off:" << t_param.h_off
 //			<< " w_off:" << t_param.w_off << " mirrored:" << t_param.mirrored;

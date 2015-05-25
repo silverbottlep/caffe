@@ -625,6 +625,7 @@ message ConsilienceDataParameter {
   enum InputType{
     OPTFLOW = 0;
     CONSILIENCE = 1;
+    CONSILIENCE_RESCALE = 2;
   }
 	// flow(0) jpeg(1)
   optional InputType input_type = 15 [default = OPTFLOW ];

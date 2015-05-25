@@ -370,7 +370,8 @@ class ConsilienceDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void ShuffleImages();
   virtual void InternalThreadEntry();
 
-  vector< std::pair< std::pair<std::string, int>, int> > lines_;
+  //vector< std::pair< std::pair<std::string, int>, int> > lines_;
+  vector<struct data_item> lines_;
   int lines_id_;
 };
 

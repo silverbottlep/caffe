@@ -3,16 +3,32 @@ import caffe
 from caffe.proto.caffe_pb2 import *
 from google import protobuf
 
-model_root = '/home/eunbyung/Works/src/caffe/examples/consilience/' 
+#model_root = '/home/eunbyung/Works/src/caffe/examples/consilience/' 
 #spatialnet_proto_file = model_root + 'spatialnet_ft.prototxt'
 #temporalnet_proto_file = model_root + 'temporalnet_ft.prototxt'
-spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
-temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
-consiliencenet_proto_file = model_root + 'consilience.prototxt'
-consiliencenet_param_file = model_root + 'snapshot/' + 'consilience.caffemodel'
+#spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
+#spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_vgg19.caffemodel'
+#temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
+#temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_rescale_iter_200000.caffemodel'
+#consiliencenet_proto_file = model_root + 'consilience.prototxt'
+#consiliencenet_proto_file = model_root + 'vgg19_consilience.prototxt'
+#consiliencenet_param_file = model_root + 'snapshot/' + 'vgg19_consilience_rescale.caffemodel'
+
+consiliencenet_proto_file ='/home/eunbyung/Works/src/caffe/examples/consilience/consilience.prototxt'
+consiliencenet_param_file ='/home/eunbyung/Works/src/caffe/examples/consilience/snapshot/vgg19_consilience.caffemodel'
+#consiliencenet_param_file ='/home/eunbyung/Works/src/caffe/examples/split3/snapshot/consilience.caffemodel'
+#consiliencenet_proto_file ='/home/eunbyung/Works/src/caffe/examples/consilience/vgg19_consilience.prototxt'
+#consiliencenet_param_file ='/home/eunbyung/Works/src/caffe/examples/split3/snapshot/vgg19_consilience.caffemodel'
+
+#spatialnet_param_file = '/home/eunbyung/Works/src/caffe/examples/consilience/snapshot/spatialnet_ft_iter_45000.caffemodel'
+spatialnet_param_file = '/home/eunbyung/Works/src/caffe/examples/consilience/snapshot/spatialnet_vgg19.caffemodel'
+
+temporalnet_param_file = '/home/eunbyung/Works/src/caffe/examples/consilience/snapshot/temporalnet_rescale_iter_200000.caffemodel'
+#temporalnet_param_file = '/home/eunbyung/Works/src/caffe/examples/split2/snapshot/temporalnet_iter_180000.caffemodel'
+#temporalnet_param_file = '/home/eunbyung/Works/src/caffe/examples/split3/snapshot/temporalnet_iter_200000.caffemodel'
 
 # loading spatialnet, and build blob lookup dic
-print "Loading blobs from", spatialnet.name
+print "Loading blobs from spatialnet"
 spatialnet = NetParameter()
 sf = open(spatialnet_param_file,'rb')
 spatialnet.ParseFromString(sf.read())
@@ -27,7 +43,7 @@ for layer in spatialnet.layers:
         print "-", new_name
 
 # loading temporalnet, and build blob lookup dic
-print "Loading blobs from", temporalnet.name
+print "Loading blobs from temporal"
 temporalnet = NetParameter()
 tf = open(temporalnet_param_file,'rb')
 temporalnet.ParseFromString(tf.read())

@@ -49,6 +49,9 @@ class DataTransformer {
 	void ConsilienceTransform(const int batch_item_id, 
 					const Datum& flow_datum, const Dtype* mean, Dtype* transformed_flow_data, 
 					struct transform_param& t_param);
+	void ConsilienceRescaleTransform(const int batch_item_id, 
+					const Datum& flow_datum, float min, float max, const Dtype* mean, 
+					Dtype* transformed_flow_data, struct transform_param& t_param);
 
  protected:
   virtual unsigned int Rand();

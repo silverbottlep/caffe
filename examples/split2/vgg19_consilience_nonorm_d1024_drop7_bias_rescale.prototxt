@@ -11,7 +11,7 @@ layers {
     image_dir: "data/ucf101/ucf101_image/"
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
-    batch_size: 40
+    batch_size: 30
 		input_type: CONSILIENCE_RESCALE
 		rgb_num_channels: 1
   }

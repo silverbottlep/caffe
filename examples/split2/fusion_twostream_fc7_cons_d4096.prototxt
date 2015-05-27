@@ -12,7 +12,7 @@ layers {
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
     batch_size: 64
-		input_type: CONSILIENCE
+		input_type: CONSILIENCE_RESCALE
 		rgb_num_channels: 1
   }
   transform_param {
@@ -35,7 +35,7 @@ layers {
     flow_dir: "data/ucf101/ucf101_opt/"
 		shuffle: true
     batch_size: 50
-		input_type: CONSILIENCE
+		input_type: CONSILIENCE_RESCALE
 		rgb_num_channels: 1
   }
   transform_param {

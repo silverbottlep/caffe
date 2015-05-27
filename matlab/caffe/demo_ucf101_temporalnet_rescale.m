@@ -1,11 +1,11 @@
 src_dir = '../../data/ucf101/ucf101_opt/';
-list_file = '../../data/ucf101/test1.txt';
+list_file = '../../data/ucf101/test3.txt';
 
 model_def_file = '../../examples/twostream/temporalnet_deploy.prototxt';
-model_file = '../../examples/twostream/snapshot/temporalnet_rescale_iter_200000.caffemodel';
+model_file = '../../examples/split3/snapshot/temporalnet_iter_200000.caffemodel';
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);
-caffe('set_device',0);
+caffe('set_device',2);
 
 list_fid = fopen(list_file);
 line = fgetl(list_fid);
@@ -90,5 +90,5 @@ for i=1:num_item
 	toc;
 end
 
-save('flow_rescale_result.mat', 'flow_result');
+save('flow_result_split3.mat', 'flow_result');
 fprintf('total accuracy:%s\n',accuracy/num_item);

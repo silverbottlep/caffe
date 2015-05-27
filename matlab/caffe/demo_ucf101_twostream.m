@@ -1,8 +1,8 @@
-%load('rgb_consilience_result.mat');
-%load('rgb_result.mat');
-load('rgb_vgg19_consilience_result.mat');
-load('rgb_vgg19_result.mat');
-load('flow_result.mat');
+load('rgb_consilience_result_split3.mat');
+load('rgb_result_split3.mat');
+%load('rgb_vgg19_consilience_result_split3.mat');
+%load('rgb_vgg19_result_split3.mat');
+load('flow_result_split3.mat');
 
 alpha = 0.1:0.1:0.9;
 accuracy = zeros(length(alpha),1);

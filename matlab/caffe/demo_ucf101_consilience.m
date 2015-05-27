@@ -22,7 +22,7 @@ list_file = '../../data/ucf101/test1.txt';
 %model_def_file = '../../examples/consilience/vgg19_baseline_B_deploy.prototxt';
 %model_file = '../../examples/consilience/snapshot/vgg19_baseline_B_iter_40000.caffemodel';
 model_def_file = '../../examples/cons/fusion_twostream_fc7_cons_d4096_deploy.prototxt';
-model_file = '../../examples/cons/snapshot/fusion_twostream_fc7_cons_d4096_drop7_iter_60000.caffemodel';
+model_file = '../../examples/cons/snapshot/fusion_twostream_fc7_cons_d4096_iter_60000.caffemodel';
 
 use_gpu = true;
 matcaffe_init(use_gpu, model_def_file, model_file);

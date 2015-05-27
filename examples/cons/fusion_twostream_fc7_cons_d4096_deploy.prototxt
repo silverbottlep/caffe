@@ -109,11 +109,10 @@ layers { bottom: "flow_fc7_comb" top: "flow_fc7_comb" name: "relu" type: RELU }
 
 layers { type: ELTWISE name: 'consilience_fc7' bottom: 'rgb_fc7_comb' bottom: 'flow_fc7_comb'
 	top: 'consilience_fc7' eltwise_param { operation: PROD } }
-layers { bottom: "consilience_fc7" top: "consilience_fc7" name: "consilience_drop7" type: DROPOUT dropout_param { dropout_ratio: 0.7 } }
 
-layers { bottom: "consilience_fc7" top: "cons_fc8" name: "cons_fc8"
+layers { bottom: "consilience_fc7" top: "fusion_fc8" name: "fusion_fc8"
   blobs_lr: 1 blobs_lr: 2 weight_decay: 1 weight_decay: 0 type: INNER_PRODUCT
   inner_product_param { num_output: 101 weight_filler { type: "gaussian" std: 0.005 }
     bias_filler { type: "constant" value: 0.1 } } }
 
-layers { name: "prob" type: SOFTMAX bottom: "cons_fc8" top: "prob" }
+layers { name: "prob" type: SOFTMAX bottom: "fusion_fc8" top: "prob" }

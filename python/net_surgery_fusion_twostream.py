@@ -4,11 +4,11 @@ from caffe.proto.caffe_pb2 import *
 from google import protobuf
 
 #model_root = '/home/eunbyung/Works/src/caffe/examples/cons/' 
-model_root = '/home/eunbyung/Works/src/caffe/examples/split2/' 
+model_root = '/home/eunbyung/Works/src/caffe/examples/split3/' 
 spatialnet_param_file = model_root + 'snapshot/' + 'spatialnet_ft_iter_45000.caffemodel'
 
-temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_180000.caffemodel'
-#temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
+#temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_180000.caffemodel'
+temporalnet_param_file = model_root + 'snapshot/' + 'temporalnet_iter_200000.caffemodel'
 
 fusion_proto_file = model_root + 'fusion_twostream.prototxt'
 fusion_param_file = model_root + 'snapshot/' + 'fusion_twostream.caffemodel'

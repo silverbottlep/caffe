@@ -1,10 +1,11 @@
 load('flow_result.mat');
-load('rgb_vgg19_result.mat');
+%load('rgb_vgg19_result_split2.mat');
 %load('rgb_vgg19_consilience_result.mat');
-load('vgg19_consilience_d1024_result.mat');
-%load('rgb_result.mat');
-%load('rgb_consilience_result.mat');
-%load('consilience_result_d2048.mat');
+%load('vgg19_consilience_result_d1024.mat');
+load('rgb_result.mat');
+%load('rgb_consilience_result_split3.mat');
+load('consilience_result_d2048.mat');
+%load('fusion_twostream_fc7_cons_d4096.mat');
 
 triple_accuracy  = zeros(11,11,11);
 total_item = length(consilience_result);

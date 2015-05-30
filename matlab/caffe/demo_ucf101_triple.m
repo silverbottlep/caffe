@@ -1,15 +1,17 @@
-%load('flow_result.mat');
+load('flow_result.mat');
 %load('rgb_vgg19_result.mat');
 %load('rgb_vgg19_consilience_result.mat');
 %load('vgg19_consilience_result.mat');
-%load('rgb_result.mat');
+load('rgb_result.mat');
 %load('rgb_consilience_result.mat');
-%load('consilience_result.mat');
+load('consilience_result_d2048.mat');
+%load('fusion_twostream_fc7_cons_d4096.mat');
 
 accuracy = 0;
 rgb_accuracy = 0;
 flow_accuracy = 0;
 consilience_accuracy = 0;
+triple_accuracy = zeros(10,10,10);
 
 total_item = length(consilience_result);
 for i=1:total_item
@@ -19,6 +21,7 @@ for i=1:total_item
 	%rgb_feat = rgb_consilience_result(i).feat;
 	rgb_feat = rgb_result(i).feat;
 	rgb_feat = sum(rgb_feat,2)/size(rgb_feat,2);
+	rgb_feat = rgb_feat/norm(rgb_feat);
 	[rgb_max_s, idx] = max(rgb_feat);
 	rgb_output_label = idx-1;
 	if label == rgb_output_label
@@ -28,6 +31,7 @@ for i=1:total_item
 
 	flow_feat = flow_result(i).feat;
 	flow_feat = sum(flow_feat,2)/size(flow_feat,2);
+	flow_feat = flow_feat/norm(flow_feat);
 	[flow_max_s, idx] = max(flow_feat);
 	flow_output_label = idx-1;
 	if label == flow_output_label
@@ -37,6 +41,7 @@ for i=1:total_item
 
 	consilience_feat = consilience_result(i).feat;
 	consilience_feat = sum(consilience_feat,2)/250;
+	consilience_feat = consilience_feat/norm(consilience_feat);
 	%consilience_feat = sum(consilience_feat,2)/size(consilience_feat,2);
 	[consilience_max_s, idx] = max(consilience_feat);
 	consilience_output_label = idx-1;
@@ -45,19 +50,33 @@ for i=1:total_item
 	end
 	fprintf('consilience: %d, %.2f, (accuracy:%.2f)\n', consilience_output_label, consilience_max_s, 100*consilience_accuracy/i);
 
-	feat = rgb_feat.*1 + flow_feat.*1 + consilience_feat.*1;
+	feat = rgb_feat.*2 + flow_feat.*3 + consilience_feat.*1;
 	[max_s, idx] = max(feat);
 	triple_output_label = idx-1;
 	if label == triple_output_label
 		accuracy = accuracy+1;
 	end
 	fprintf('full: %d, %.2f, (accuracy:%.2f)\n\n', triple_output_label, max_s, 100*accuracy/i);
-	
+
+	for r=0:9
+	for f=0:9
+	for c=0:9
+		triple_feat = rgb_feat*r + flow_feat*f + consilience_feat*c;
+		[triple_max_s, idx] = max(triple_feat);
+		triple_output_label = idx-1;
+		if label == triple_output_label
+			triple_accuracy(r+1,f+1,c+1) = triple_accuracy(r+1,f+1,c+1)+1;
+		end
+	end
+	end
+	end
+
 %	fprintf('processing %s gt:%d (rgb %d, %.2f) (flow %d, %.2f) (consilience %d, %.2f) (triple %d, %.2f)\n', ...
 %					rgb_output_label, 100*rgb_accuracy/i, flow_output_label, ...
 %					100*flow_accuracy/i, consilience_output_label, 100*consilience_accuracy/i, triple_output_label, 100*accuracy/i);
 end
 
+triple_accuracy = triple_accuracy/total_item;
 fprintf('rgb accuracy = %f\n', rgb_accuracy/total_item);
 fprintf('flow accuracy = %f\n', flow_accuracy/total_item);
 fprintf('consilience accuracy = %f\n', consilience_accuracy/total_item);

@@ -1,4 +1,4 @@
-net: "examples/cons_imagenet/consilience_comb_d2048.prototxt"
+net: "examples/cons_imagenet/baseline_B_comb_d512.prototxt"
 test_iter: 1000
 test_interval: 1000
 base_lr: 0.001
@@ -10,5 +10,5 @@ max_iter: 120000
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 40000
-snapshot_prefix: "examples/cons_imagenet/snapshot/consilience_comb_d2048"
+snapshot_prefix: "examples/cons_imagenet/snapshot/baseline_B_comb_d512"
 solver_mode: GPU

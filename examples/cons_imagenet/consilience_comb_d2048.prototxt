@@ -7,9 +7,10 @@ layers {
   top: "label"
   data_param {
     #source: "examples/imagenet/ilsvrc12_train_lmdb"
-    source: "/playpen1/data/imagenet/ILSVRC2014/classification/JPEGImages/ilsvrc12_train_lmdb"
+    #source: "/playpen1/data/imagenet/ILSVRC2014/classification/JPEGImages/ilsvrc12_train_lmdb"
+    source: "/data/ilsvrc14/classification/JPEGImages/ilsvrc12_train_lmdb"
     backend: LMDB
-    batch_size: 256
+    batch_size: 128
   }
   transform_param {
     crop_size: 227
@@ -25,7 +26,8 @@ layers {
   top: "label"
   data_param {
     #source: "examples/imagenet/ilsvrc12_val_lmdb"
-    source: "/playpen1/data/imagenet/ILSVRC2014/classification/JPEGImages/ilsvrc12_val_lmdb"
+    #source: "/playpen1/data/imagenet/ILSVRC2014/classification/JPEGImages/ilsvrc12_val_lmdb"
+    source: "/data/ilsvrc14/classification/JPEGImages/ilsvrc12_val_lmdb"
     backend: LMDB
     batch_size: 50
   }

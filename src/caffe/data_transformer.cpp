@@ -217,8 +217,7 @@ void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id,
                 * crop_size + (crop_size - 1 - w);
             transformed_flow_data[top_index] =
                 static_cast<Dtype>(static_cast<uint8_t>
-										(flow_data[data_index] - mean_value[c]));
-										//(flow_data[data_index] - mean[mean_index]));
+										(flow_data[data_index] - mean[mean_index]));
           }
         }
       }
@@ -233,8 +232,7 @@ void DataTransformer<Dtype>::ConsilienceTransform(const int batch_item_id,
             int mean_index = ((c%2) * height + h + h_off) * width + w + w_off;
             transformed_flow_data[top_index] =
                 static_cast<Dtype>(static_cast<uint8_t>(
-										flow_data[data_index] - mean_value[c]));
-											//flow_data[data_index] - mean[mean_index]));
+											flow_data[data_index] - mean[mean_index]));
           }
         }
       }
